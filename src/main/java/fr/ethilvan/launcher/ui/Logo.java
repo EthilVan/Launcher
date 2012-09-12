@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.Util;
+import fr.ethilvan.launcher.util.Util;
 
 public class Logo extends JPanel {
 

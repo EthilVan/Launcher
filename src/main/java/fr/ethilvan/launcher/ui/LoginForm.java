@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -65,7 +67,6 @@ public class LoginForm extends JPanel {
         loginC.gridy = 1;
 
         GridBagConstraints rememberMeC = new GridBagConstraints();
-        //rememberMeC.fill = GridBagConstraints.HORIZONTAL;
         rememberMeC.anchor = GridBagConstraints.LINE_END;
         rememberMeC.insets = new Insets(6, 0, 2, 0);
         rememberMeC.gridx = 2;
@@ -91,6 +92,12 @@ public class LoginForm extends JPanel {
         options.setOpaque(false);
         JButton login = new JButton("Connexion");
         login.setOpaque(false);
+
+        options.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                new OptionsDialog(getRootPane()).setVisible(true);
+            }
+        });
 
         add(usernameLabel, usernameLabelC);
         add(username, usernameC);
