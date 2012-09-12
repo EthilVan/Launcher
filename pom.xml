@@ -26,10 +26,12 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.test.skip>true</maven.test.skip>
+		<BUILD_NUMBER>Custom</BUILD_NUMBER>
 	</properties>
 
 	<build>
 
+		<finalName>EthilVan</finalName>
 		<defaultGoal>clean install</defaultGoal>
 		<resources>
 			<resource>
@@ -65,10 +67,19 @@
 				<version>2.3.1</version>
 				<configuration>
 					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>fr.ethilvan.launcher.Launcher</mainClass>
+							<addDefaultImplementationEntries>
+								true
+							</addDefaultImplementationEntries>
 						</manifest>
+						<manifestEntries>
+							<Implementation-Version>
+								${project.version}-b${BUILD_NUMBER}
+							</Implementation-Version>
+							<Main-Class>fr.ethilvan.launcher.Launcher</Main-Class>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>

@@ -9,6 +9,22 @@ import fr.ethilvan.launcher.util.OS;;
 
 public class Launcher {
 
+    public static final String VERSION;
+
+    static {
+        Package ppackage = Launcher.class.getPackage();
+        String version;
+        if (ppackage == null) {
+            version = "(unknown)";
+        } else {
+            version = ppackage.getImplementationVersion();
+            if (version == null) {
+                version = "(unknown)";
+            }
+        }
+
+        VERSION = version;
+    }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
 
