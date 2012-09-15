@@ -30,8 +30,9 @@ public class OptionsDialog extends JDialog {
     public OptionsDialog(Component frame) {
         super();
 
-        setModal(true);
         setTitle("Options");
+        setModal(true);
+        setResizable(false);
         setLayout(new GridBagLayout());
 
         Insets insets = new Insets(6, 12, 6, 12);
@@ -39,27 +40,23 @@ public class OptionsDialog extends JDialog {
         JToggleButton forceUpdate = new JToggleButton("Forcer la mise à jour");
         forceUpdate.setSelected(Launcher.get().getForceUpdate());
         GridBagConstraints forceUpdateC = new GridBagConstraints();
-        forceUpdateC.fill = GridBagConstraints.HORIZONTAL;
-        forceUpdateC.insets = insets;
+        forceUpdateC.insets = new Insets(6, 12, 6, 4);
         forceUpdateC.gridx = 0;
         forceUpdateC.gridy = 0;
-        forceUpdateC.gridwidth = 2;
         add(forceUpdate, forceUpdateC);
 
         JToggleButton devMode = new JToggleButton("Mode développement");
         devMode.setSelected(Launcher.get().getOptions().isDevMode());
         GridBagConstraints devModeC = new GridBagConstraints();
-        devModeC.fill = GridBagConstraints.HORIZONTAL;
-        devModeC.insets = insets;
-        devModeC.gridx = 0;
-        devModeC.gridy = 1;
-        devModeC.gridwidth = 2;
+        devModeC.insets = new Insets(6, 4, 6, 12);;
+        devModeC.gridx = 1;
+        devModeC.gridy = 0;
         add(devMode, devModeC);
 
         JLabel directoryLabel = new JLabel("Dossier du jeu : ",
                 SwingConstants.RIGHT);
         GridBagConstraints directoryLabelC = new GridBagConstraints();
-        directoryLabelC.fill = GridBagConstraints.HORIZONTAL;
+        directoryLabelC.anchor = GridBagConstraints.LINE_START;
         directoryLabelC.insets = insets;
         directoryLabelC.gridx = 0;
         directoryLabelC.gridy = 2;
@@ -86,13 +83,32 @@ public class OptionsDialog extends JDialog {
         directoryC.gridwidth = 2;
         add(directory, directoryC);
 
+        JLabel versionLabel = new JLabel("Version du launcher : ");
+        GridBagConstraints versionLabelC = new GridBagConstraints();
+        versionLabelC.anchor = GridBagConstraints.LINE_START;
+        versionLabelC.insets = insets;
+        versionLabelC.gridx = 0;
+        versionLabelC.gridy = 5;
+        add(versionLabel, versionLabelC);
+
+        JLabel version = new JLabel(Launcher.VERSION);
+        GridBagConstraints versionC = new GridBagConstraints();
+        versionC.anchor = GridBagConstraints.FIRST_LINE_END;
+        versionC.insets = insets;
+        versionC.gridx = 1;
+        versionC.gridy = 5;
+        add(version, versionC);
+
         JButton done = new JButton("Terminer");
         GridBagConstraints doneC = new GridBagConstraints();
         doneC.anchor = GridBagConstraints.LAST_LINE_END;
-        doneC.insets = insets;
+        doneC.insets = new Insets(12, 12, 6, 12);
         doneC.gridx = 1;
-        doneC.gridy = 4;
+        doneC.gridy = 7;
         add(done, doneC);
+
+        pack();
+        setLocationRelativeTo(frame);
 
         forceUpdate.addItemListener(new ItemListener() {
             @Override
@@ -119,8 +135,5 @@ public class OptionsDialog extends JDialog {
                 OptionsDialog.this.dispose();
             }
         });
-
-        pack();
-        setLocationRelativeTo(frame);
     }
 }
