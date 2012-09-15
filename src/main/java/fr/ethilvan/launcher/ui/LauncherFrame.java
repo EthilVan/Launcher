@@ -23,7 +23,7 @@ public class LauncherFrame extends JFrame {
 
     private void build() {
         setTitle("Ethil Van Launcher");
-        setPreferredSize(new Dimension(874, 520));
+        setMinimumSize(new Dimension(874, 520));
         setLocationRelativeTo(null);
 
         try {

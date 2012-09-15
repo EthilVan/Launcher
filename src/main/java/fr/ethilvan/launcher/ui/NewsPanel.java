@@ -1,30 +1,32 @@
 package fr.ethilvan.launcher.ui;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.NewsDownloader;
 
 public class NewsPanel extends JPanel {
 
     private static final long serialVersionUID = 5869234355558740443L;
 
     private final Image bg;
+    private final JTextPane textPane;
 
     public NewsPanel() {
         super();
         setOpaque(true);
-
         Image tmpBg = null;
         try {
             InputStream is = Launcher.class
@@ -35,37 +37,55 @@ public class NewsPanel extends JPanel {
             }
         } catch (IOException _) {
         }
-        bg = tmpBg;
+        this.bg = tmpBg;
 
+        final JProgressBar progressBar = new JProgressBar();
+        this.textPane = new JTextPane();
+
+        build(progressBar);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NewsDownloader newsDownloader =
+                        new NewsDownloader(NewsPanel.this, progressBar);
+                try {
+                    newsDownloader.download();
+                } catch (IOException exc) {
+                    exc.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void build(JProgressBar progressBar) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        StringBuilder news = new StringBuilder();
-        InputStream is = Launcher.class
-                .getResourceAsStream("/news.txt");
-        if (is != null) {
-            try {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(is));
-                char[] temp = new char[1024];
-                int length = 0;
-                while((length = reader.read(temp)) > 0) {
-                    news.append(temp, 0, length);
-                }
-                reader.close();
-            } catch (IOException _) {
-            }
-        }
+        progressBar.setPreferredSize(new Dimension(300, 18));
+        progressBar.setIndeterminate(true);
 
-        JTextPane textPane = new JTextPane();
+        JPanel progressPane = new JPanel();
+        progressPane.setOpaque(false);
+        progressPane.setLayout(new GridBagLayout());
+        progressPane.add(progressBar);
+        add(progressPane);
+
+        textPane.setVisible(false);
         textPane.setOpaque(false);
         textPane.setEditable(false);
-        textPane.setContentType("text/html");
-        textPane.setText(news.toString());
-        textPane.setCaretPosition(0);
+        textPane.setContentType("text/html;charset=utf-8");
         JScrollPane newsScroll = new JScrollPane(textPane);
         newsScroll.getViewport().setOpaque(false);
         newsScroll.setOpaque(false);
         add(newsScroll);
+    }
+
+    public void displayNews(String news, JProgressBar progressBar) {
+        textPane.setText(news.toString());
+        textPane.setCaretPosition(0);
+
+        progressBar.getParent().setVisible(false);
+        textPane.setVisible(true);
     }
 
     @Override

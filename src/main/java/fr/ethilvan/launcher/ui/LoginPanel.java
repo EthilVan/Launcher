@@ -2,6 +2,7 @@ package fr.ethilvan.launcher.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -40,6 +41,8 @@ public class LoginPanel extends JPanel {
 
         add(new Logo(), BorderLayout.LINE_START);
         add(new LoginForm(), BorderLayout.LINE_END);
+        setMaximumSize(new Dimension(getMaximumSize().width,
+                getPreferredSize().height));
     }
 
     @Override
