@@ -14,9 +14,11 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
@@ -33,79 +35,71 @@ public class OptionsDialog extends JDialog {
         setTitle("Options");
         setModal(true);
         setResizable(false);
-        setLayout(new GridBagLayout());
 
-        Insets insets = new Insets(6, 12, 6, 12);
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        add(panel);
 
         JToggleButton forceUpdate = new JToggleButton("Forcer la mise à jour");
         forceUpdate.setSelected(Launcher.get().getForceUpdate());
         GridBagConstraints forceUpdateC = new GridBagConstraints();
-        forceUpdateC.insets = new Insets(6, 12, 6, 4);
+        forceUpdateC.insets = new Insets(0, 0, 10, 4);
         forceUpdateC.gridx = 0;
         forceUpdateC.gridy = 0;
-        add(forceUpdate, forceUpdateC);
+        panel.add(forceUpdate, forceUpdateC);
 
         JToggleButton devMode = new JToggleButton("Mode développement");
         devMode.setSelected(Launcher.get().getOptions().isDevMode());
         GridBagConstraints devModeC = new GridBagConstraints();
-        devModeC.insets = new Insets(6, 4, 6, 12);;
+        devModeC.insets = new Insets(0, 4, 10, 0);
         devModeC.gridx = 1;
         devModeC.gridy = 0;
-        add(devMode, devModeC);
+        panel.add(devMode, devModeC);
 
         JLabel directoryLabel = new JLabel("Dossier du jeu : ",
                 SwingConstants.RIGHT);
         GridBagConstraints directoryLabelC = new GridBagConstraints();
         directoryLabelC.anchor = GridBagConstraints.LINE_START;
-        directoryLabelC.insets = insets;
+        directoryLabelC.insets = new Insets(0, 0, 6, 0);;
         directoryLabelC.gridx = 0;
         directoryLabelC.gridy = 2;
-        add(directoryLabel, directoryLabelC);
+        panel.add(directoryLabel, directoryLabelC);
 
         final JLabel directory = new JLabel("<html><a href=\"\">"
                 + Launcher.get().getGameDirectory() + "</a></html>");
         directory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        directory.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent event) {
-                try {
-                    Util.openURI(Launcher.get().getGameDirectory().toURI());
-                } catch (IOException _) {
-                } catch (URISyntaxException _) {
-                }
-            }
-        });
         GridBagConstraints directoryC = new GridBagConstraints();
         directoryC.anchor = GridBagConstraints.LINE_END;
-        directoryC.insets = insets;
+        directoryC.insets = new Insets(0, 0, 10, 0);;
         directoryC.gridx = 0;
         directoryC.gridy = 3;
         directoryC.gridwidth = 2;
-        add(directory, directoryC);
+        panel.add(directory, directoryC);
 
         JLabel versionLabel = new JLabel("Version du launcher : ");
         GridBagConstraints versionLabelC = new GridBagConstraints();
         versionLabelC.anchor = GridBagConstraints.LINE_START;
-        versionLabelC.insets = insets;
+        versionLabelC.insets = new Insets(0, 0, 6, 0);;
         versionLabelC.gridx = 0;
         versionLabelC.gridy = 5;
-        add(versionLabel, versionLabelC);
+        panel.add(versionLabel, versionLabelC);
 
         JLabel version = new JLabel(Launcher.VERSION);
         GridBagConstraints versionC = new GridBagConstraints();
         versionC.anchor = GridBagConstraints.FIRST_LINE_END;
-        versionC.insets = insets;
+        versionC.insets = new Insets(0, 0, 10, 0);;
         versionC.gridx = 1;
         versionC.gridy = 5;
-        add(version, versionC);
+        panel.add(version, versionC);
 
         JButton done = new JButton("Terminer");
         GridBagConstraints doneC = new GridBagConstraints();
         doneC.anchor = GridBagConstraints.LAST_LINE_END;
-        doneC.insets = new Insets(12, 12, 6, 12);
+        doneC.insets = new Insets(6, 0, 0, 0);
         doneC.gridx = 1;
         doneC.gridy = 7;
-        add(done, doneC);
+        panel.add(done, doneC);
 
         pack();
         setLocationRelativeTo(frame);
@@ -126,6 +120,17 @@ public class OptionsDialog extends JDialog {
                 directory.setText("<html><a href=\"\">"
                         + Launcher.get().getGameDirectory() + "</a></html>");
                 OptionsDialog.this.pack();
+            }
+        });
+
+        directory.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent event) {
+                try {
+                    Util.openURI(Launcher.get().getGameDirectory().toURI());
+                } catch (IOException _) {
+                } catch (URISyntaxException _) {
+                }
             }
         });
 

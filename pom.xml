@@ -26,7 +26,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.test.skip>true</maven.test.skip>
-		<BUILD_NUMBER>Custom</BUILD_NUMBER>
 	</properties>
 
 	<build>
@@ -44,6 +43,7 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<targetPath>.</targetPath>
+				<filtering>true</filtering>
 				<includes>
 					<include>*</include>
 				</includes>
@@ -86,4 +86,19 @@
 
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>custom-build</id>
+			<activation>
+				<property>
+					<name>!env.BUILD_NUMBER</name>
+				</property>
+			</activation>
+			<properties>
+				<BUILD_NUMBER>Custom</BUILD_NUMBER>
+			</properties>
+		</profile>
+	</profiles>
+
 </project>

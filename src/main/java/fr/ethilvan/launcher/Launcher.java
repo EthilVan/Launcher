@@ -15,16 +15,17 @@ public class Launcher {
         Package ppackage = Launcher.class.getPackage();
         String version;
         if (ppackage == null) {
-            version = "(unknown)";
+            version = "(inconnue)";
         } else {
             version = ppackage.getImplementationVersion();
             if (version == null) {
-                version = "(unknown)";
+                version = "(inconnue)";
             }
         }
 
         VERSION = version;
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -69,7 +70,7 @@ public class Launcher {
 
         if (!file.exists()) {
             if (!file.mkdirs()) {
-                throw new RuntimeException("Imossible de créer le dossier : "
+                throw new RuntimeException("Impossible de créer le dossier : "
                         + file.toString());
             }
         } else if (!file.isDirectory()) {
