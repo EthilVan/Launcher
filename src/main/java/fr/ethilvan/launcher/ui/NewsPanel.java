@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -13,9 +15,13 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.Document;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.NewsDownloader;
+import fr.ethilvan.launcher.util.Util;
 
 public class NewsPanel extends JPanel {
 
@@ -74,13 +80,36 @@ public class NewsPanel extends JPanel {
         textPane.setOpaque(false);
         textPane.setEditable(false);
         textPane.setContentType("text/html;charset=utf-8");
+
+        textPane.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent event) {
+                if (event.getEventType()
+                        != HyperlinkEvent.EventType.ACTIVATED) {
+                    return;
+                }
+
+                if (event.getURL() == null) {
+                    return;
+                }
+
+                try {
+                    Util.openURL(event.getURL());
+                } catch (IOException _) {
+                } catch (URISyntaxException _) {
+                }
+            }
+        });
+
         JScrollPane newsScroll = new JScrollPane(textPane);
         newsScroll.getViewport().setOpaque(false);
         newsScroll.setOpaque(false);
         add(newsScroll);
     }
 
-    public void displayNews(String news, JProgressBar progressBar) {
+    public void displayNews(URL url, String news, JProgressBar progressBar) {
+        textPane.getDocument().putProperty(
+                Document.StreamDescriptionProperty, url);
         textPane.setText(news.toString());
         textPane.setCaretPosition(0);
 

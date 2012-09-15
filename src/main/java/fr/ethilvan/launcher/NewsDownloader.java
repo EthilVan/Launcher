@@ -3,6 +3,7 @@ package fr.ethilvan.launcher;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EventObject;
 
@@ -15,11 +16,11 @@ import com.sk89q.mclauncher.DownloadProgressEvent;
 import com.sk89q.mclauncher.HTTPDownloader;
 
 import fr.ethilvan.launcher.ui.NewsPanel;
+import fr.ethilvan.launcher.util.Util;
 
 public class NewsDownloader implements DownloadListener {
 
-    private static final String NEWS_URL = "http://ethilvan.fr/news/launcher";
-    //private static final Charset encoding = Charset.forName("UTF-8");
+    private static final String NEWS_URL = Util.ETHILVAN_FR + "/news/launcher";
 
     private final NewsPanel newsPanel;
     private final JProgressBar progressBar;
@@ -66,8 +67,11 @@ public class NewsDownloader implements DownloadListener {
     @Override
     public void downloadCompleted(EventObject event) {
         try {
-            newsPanel.displayNews(output.toString("UTF-8"), progressBar);
+            newsPanel.displayNews(new URL(NEWS_URL), output.toString("UTF-8"),
+                    progressBar);
         } catch (UnsupportedEncodingException exc) {
+            exc.printStackTrace();
+        } catch (MalformedURLException exc) {
             exc.printStackTrace();
         }
     }

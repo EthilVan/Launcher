@@ -6,14 +6,20 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 public final class Util {
 
-    private static final String ETHILVAN_FR = "http://ethilvan.fr";
+    public static final String ETHILVAN_FR = "http://ethilvan.fr";
 
     public static void openURI(URI uri)
             throws IOException, URISyntaxException {
         Desktop.getDesktop().browse(uri);
+    }
+
+    public static void openURL(URL url)
+            throws IOException, URISyntaxException {
+        openURI(url.toURI());
     }
 
     public static void openEthilVanFR()
