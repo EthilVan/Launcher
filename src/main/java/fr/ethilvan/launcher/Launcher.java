@@ -5,7 +5,8 @@ import java.io.File;
 import javax.swing.SwingUtilities;
 
 import fr.ethilvan.launcher.ui.LauncherFrame;
-import fr.ethilvan.launcher.util.OS;;
+import fr.ethilvan.launcher.util.OS;
+import fr.ethilvan.launcher.util.Util;
 
 public class Launcher {
 
@@ -48,6 +49,10 @@ public class Launcher {
     private final Options options;
 
     public Launcher() {
+        System.setProperty("http.agent",
+                "EthilVanLauncher/" + VERSION
+                + " (" + OS.get().name() +
+                "; +" + Util.ETHILVAN_FR + ")");
         forceUpdate = false;
         this.options = new Options();
     }
