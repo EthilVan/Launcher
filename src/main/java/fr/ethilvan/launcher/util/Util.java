@@ -12,6 +12,22 @@ public final class Util {
 
     public static final String ETHILVAN_FR = "http://ethilvan.fr";
 
+    public static URL urlFor(String url) {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+    public static URI uriFor(String url) {
+        try {
+            return new URI(url);
+        } catch (URISyntaxException exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
     public static void openURI(URI uri)
             throws IOException, URISyntaxException {
         Desktop.getDesktop().browse(uri);

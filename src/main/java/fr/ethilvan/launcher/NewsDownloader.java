@@ -3,76 +3,69 @@ package fr.ethilvan.launcher;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.EventObject;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JProgressBar;
 
-import com.sk89q.mclauncher.DownloadListener;
-import com.sk89q.mclauncher.DownloadProgressEvent;
-import com.sk89q.mclauncher.HTTPDownloader;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.HttpExchange;
+import org.eclipse.jetty.io.Buffer;
 
 import fr.ethilvan.launcher.ui.NewsPanel;
 import fr.ethilvan.launcher.util.Util;
 
-public class NewsDownloader implements DownloadListener {
+public class NewsDownloader extends HttpExchange {
 
     private static final String NEWS_URL = Util.ETHILVAN_FR + "/news/launcher";
 
     private final NewsPanel newsPanel;
     private final JProgressBar progressBar;
     private final ByteArrayOutputStream output;
-    private final HTTPDownloader newsDownload;
 
     public NewsDownloader(NewsPanel newsPanel, JProgressBar progressBar) {
+        super();
         this.newsPanel = newsPanel;
         this.progressBar = progressBar;
 
-        try {
-            output = new ByteArrayOutputStream();
-            URL newsUrl = new URL(NEWS_URL);
-            newsDownload = new HTTPDownloader(newsUrl, output);
-            newsDownload.addDownloadListener(this);
-        } catch (IOException exc) {
-            throw new RuntimeException(exc);
+        setURL(NEWS_URL);
+        output = new ByteArrayOutputStream();
+    }
+
+    public void download() throws Exception {
+        HttpClient client = new HttpClient();
+        client.start();
+        client.send(this);
+    }
+
+    @Override
+    protected void onResponseHeader(Buffer name, Buffer value) {
+        if (name.toString().equals("Content-Length")) {
+            int length = Integer.parseInt(value.toString());
+            BoundedRangeModel range = new DefaultBoundedRangeModel(0, 0, 0,
+                    (int) length);
+            progressBar.setIndeterminate(false);
+            progressBar.setModel(range);
+            progressBar.setValue(0);
         }
     }
 
-    public void download() throws IOException {
-        newsDownload.download();
-    }
-
     @Override
-    public void connectionStarted(EventObject event) {
-    }
-
-    @Override
-    public void lengthKnown(EventObject event) {
-        HTTPDownloader source = (HTTPDownloader) event.getSource();
-        BoundedRangeModel range = new DefaultBoundedRangeModel(0, 0, 0,
-                (int) source.getTotalLength());
-        progressBar.setIndeterminate(false);
-        progressBar.setModel(range);
-        progressBar.setValue(0);
-    }
-
-    @Override
-    public void downloadProgress(DownloadProgressEvent event) {
-        progressBar.setValue((int) event.getDownloadedLength());
-    }
-
-    @Override
-    public void downloadCompleted(EventObject event) {
+    protected void onResponseContent(Buffer content) {
+        int length = content.length();
         try {
-            newsPanel.displayNews(new URL(NEWS_URL), output.toString("UTF-8"),
-                    progressBar);
+            content.writeTo(output);
+        } catch (IOException exc) {
+        }
+        progressBar.setValue(progressBar.getValue() + length);
+    }
+
+    @Override
+    protected void onResponseComplete() {
+        try {
+            newsPanel.displayNews(Util.urlFor(NEWS_URL),
+                    output.toString("UTF-8"), progressBar);
         } catch (UnsupportedEncodingException exc) {
-            exc.printStackTrace();
-        } catch (MalformedURLException exc) {
-            exc.printStackTrace();
         }
     }
 }

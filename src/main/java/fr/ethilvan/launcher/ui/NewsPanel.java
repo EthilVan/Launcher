@@ -57,7 +57,7 @@ public class NewsPanel extends JPanel {
                         new NewsDownloader(NewsPanel.this, progressBar);
                 try {
                     newsDownloader.download();
-                } catch (IOException exc) {
+                } catch (Exception exc) {
                     exc.printStackTrace();
                 }
             }
