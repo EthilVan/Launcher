@@ -1,5 +1,7 @@
 package fr.ethilvan.launcher.ui;
 
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
+
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -15,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import fr.ethilvan.launcher.updater.UpdateChecker;
+import fr.ethilvan.launcher.updater.Updater;
 
 public class LoginForm extends JPanel {
 
@@ -96,6 +101,26 @@ public class LoginForm extends JPanel {
         options.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 new OptionsDialog(getRootPane()).setVisible(true);
+            }
+        });
+
+        login.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                final UpdateChecker checker = new UpdateChecker();
+                if (!checker.needUpdate()) {
+                    return;
+                }
+
+                final DownloadDialog dialog =
+                        new DownloadDialog(getRootPane());
+                new Thread(new Runnable() {
+                    public void run() {
+                        Updater updater = new Updater(checker, dialog);
+                        updater.perform();
+                    }
+                }).start();
+                dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+                dialog.setVisible(true);
             }
         });
 

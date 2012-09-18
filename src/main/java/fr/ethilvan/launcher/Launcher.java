@@ -28,11 +28,11 @@ public class Launcher {
     }
 
     public static void main(String[] args) {
+        instance = new Launcher();
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                instance = new Launcher();
                 LauncherFrame frame = new LauncherFrame();
                 frame.setVisible(true);
             }
