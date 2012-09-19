@@ -12,12 +12,13 @@ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import fr.ethilvan.launcher.ui.DownloadDialog;
+import fr.ethilvan.launcher.ui.TaskDialog;
+import fr.ethilvan.launcher.util.Util;
 
 public enum DownloadFilter {
 
     None {
-        public void filter(DownloadDialog dialog, InputStream input,
+        public void filter(TaskDialog dialog, InputStream input,
                 File targetPath) {
             FileOutputStream output = null;
             try {
@@ -25,6 +26,7 @@ public enum DownloadFilter {
                 output = new FileOutputStream(targetPath);
                 IOUtils.copy(input, output);
             } catch (IOException exc) {
+                throw Util.wrap(exc);
             } finally {
                 IOUtils.closeQuietly(output);
                 IOUtils.closeQuietly(input);
@@ -33,7 +35,7 @@ public enum DownloadFilter {
     },
 
     TarXz {
-        public void filter(DownloadDialog dialog, InputStream input,
+        public void filter(TaskDialog dialog, InputStream input,
                 File targetPath) {
             InputStream inputStream = null;
             try {
@@ -48,7 +50,7 @@ public enum DownloadFilter {
                         continue;
                     }
 
-                    dialog.update("Uncompressing " + entry.getName(), null);
+                    dialog.setStatus("Uncompressing " + entry.getName(), null);
                     File targetFile = new File(targetPath, entry.getName());
                     FileUtils.forceMkdir(targetFile.getParentFile());
                     OutputStream output = new FileOutputStream(targetFile);
@@ -56,12 +58,12 @@ public enum DownloadFilter {
                     IOUtils.closeQuietly(output);
                 }
             } catch (IOException exc) {
-                exc.printStackTrace();
+                throw Util.wrap(exc);
             } finally {
                 IOUtils.closeQuietly(inputStream);
             }
         }
     };
 
-    abstract void filter(DownloadDialog dialog, InputStream input, File targetDir);
+    abstract void filter(TaskDialog dialog, InputStream input, File targetDir);
 }

@@ -13,18 +13,18 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
-import fr.ethilvan.launcher.ui.DownloadDialog;
+import fr.ethilvan.launcher.ui.TaskDialog;
 
 public class Download extends HttpExchange {
 
-    private final DownloadDialog dialog;
+    private final TaskDialog dialog;
     protected final DownloadInfo info;
     private final String title;
     private final BoundedRangeModel progress;
 
     private OutputStream output;
 
-    public Download(DownloadDialog dialog, DownloadInfo info) {
+    public Download(TaskDialog dialog, DownloadInfo info) {
         super();
         this.dialog = dialog;
         this.info = info;
@@ -40,7 +40,7 @@ public class Download extends HttpExchange {
             exc.printStackTrace();
         }
 
-        dialog.update(title, null);
+        dialog.setStatus(title, null);
         setURL(info.getUrl());
         try {
             client.send(this);
@@ -56,14 +56,14 @@ public class Download extends HttpExchange {
             progress.setMinimum(0);
             progress.setMaximum(length);
             progress.setValue(0);
-            dialog.update(title, progress);
+            dialog.setStatus(title, progress);
         }
     }
 
     @Override
     protected void onResponseContent(Buffer content) {
         progress.setValue(progress.getValue() + content.length());
-        dialog.update(title, progress);
+        dialog.setStatus(title, progress);
         try {
             content.writeTo(output);
         } catch (IOException exc) {

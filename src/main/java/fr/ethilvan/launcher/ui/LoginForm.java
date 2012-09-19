@@ -18,8 +18,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import fr.ethilvan.launcher.updater.UpdateChecker;
-import fr.ethilvan.launcher.updater.Updater;
+import fr.ethilvan.launcher.Launcher;
 
 public class LoginForm extends JPanel {
 
@@ -81,8 +80,8 @@ public class LoginForm extends JPanel {
                 SwingConstants.RIGHT);
         JLabel passwordLabel = new JLabel("Mot de passe :",
                 SwingConstants.RIGHT);
-        JTextField username = new JTextField(16);
-        JPasswordField password = new JPasswordField(16);
+        final JTextField username = new JTextField(16);
+        final JPasswordField password = new JPasswordField(16);
         usernameLabel.setForeground(Color.WHITE);
         passwordLabel.setForeground(Color.WHITE);
         usernameLabel.setLabelFor(username);
@@ -106,20 +105,15 @@ public class LoginForm extends JPanel {
 
         login.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                final UpdateChecker checker = new UpdateChecker();
-                if (!checker.needUpdate()) {
-                    return;
-                }
-
-                final DownloadDialog dialog =
-                        new DownloadDialog(getRootPane());
+                final TaskDialog dialog =
+                        new TaskDialog(getRootPane());
+                dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
                 new Thread(new Runnable() {
                     public void run() {
-                        Updater updater = new Updater(checker, dialog);
-                        updater.perform();
+                        Launcher.get().login(dialog, username.getText(),
+                                password.getPassword());
                     }
                 }).start();
-                dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
                 dialog.setVisible(true);
             }
         });

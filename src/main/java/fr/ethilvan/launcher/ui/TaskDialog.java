@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-public class DownloadDialog extends JDialog {
+public class TaskDialog extends JDialog {
 
     private static final long serialVersionUID = 3508184860311427900L;
 
@@ -20,7 +20,7 @@ public class DownloadDialog extends JDialog {
     private final JLabel label;
     private final JProgressBar progressBar;
 
-    public DownloadDialog(Component frame) {
+    public TaskDialog(Component frame) {
         super();
         this.frame = frame;
 
@@ -52,7 +52,7 @@ public class DownloadDialog extends JDialog {
         setLocationRelativeTo(frame);
     }
 
-    public void update(String text, BoundedRangeModel model) {
+    public void setStatus(String text, BoundedRangeModel model) {
         label.setText(text);
         if (model == null) {
             progressBar.setIndeterminate(true);

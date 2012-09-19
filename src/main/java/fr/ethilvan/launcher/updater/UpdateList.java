@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.ui.DownloadDialog;
+import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.util.Util;
 
 public class UpdateList extends HttpExchange {
@@ -25,12 +25,12 @@ public class UpdateList extends HttpExchange {
     private static final String DEV_UPDATE_LIST_URL = Util.ETHILVAN_FR
             + "/launcher/listdev.json";
 
-    private final DownloadDialog dialog;
+    private final TaskDialog dialog;
     private final BoundedRangeModel progress;
 
     private ByteArrayOutputStream output;
 
-    public UpdateList(DownloadDialog dialog) {
+    public UpdateList(TaskDialog dialog) {
         super();
         this.dialog = dialog;
         this.progress = new DefaultBoundedRangeModel();
@@ -41,7 +41,7 @@ public class UpdateList extends HttpExchange {
         setURL(Launcher.get().getOptions().isDevMode() ?
                 DEV_UPDATE_LIST_URL : UPDATE_LIST_URL);
 
-        dialog.update("Fetching update list.", null);
+        dialog.setStatus("Fetching update list.", null);
         try {
             client.send(this);
         } catch (IOException exc) {
@@ -56,7 +56,7 @@ public class UpdateList extends HttpExchange {
             progress.setMinimum(0);
             progress.setMaximum(length);
             progress.setValue(0);
-            dialog.update("Fetching update list.", progress);
+            dialog.setStatus("Fetching update list.", progress);
         }
     }
 

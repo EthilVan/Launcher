@@ -9,19 +9,19 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.client.HttpClient;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.ui.DownloadDialog;
+import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.util.Util;
 
 public class Updater {
 
-    private final DownloadDialog dialog;
+    private final TaskDialog dialog;
     private final HttpClient client;
     private final UpdateChecker updateChecker;
 
     private File tmpDir;
     private int downloadsCount;
 
-    public Updater(UpdateChecker checker, DownloadDialog dialog) {
+    public Updater(UpdateChecker checker, TaskDialog dialog) {
         this.updateChecker = checker;
         this.dialog = dialog;
         this.client = new HttpClient();
