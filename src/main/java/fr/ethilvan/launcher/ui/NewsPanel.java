@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
@@ -95,8 +94,7 @@ public class NewsPanel extends JPanel {
 
                 try {
                     Util.openURL(event.getURL());
-                } catch (IOException _) {
-                } catch (URISyntaxException _) {
+                } catch (RuntimeException _) {
                 }
             }
         });

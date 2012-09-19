@@ -8,8 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -47,12 +45,7 @@ public class Logo extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event) {
-                try {
-                    Util.openEthilVanFR();
-                } catch (MalformedURLException _) {
-                } catch (IOException _) {
-                } catch (URISyntaxException _) {
-                }
+                Util.openEthilVanFR();
             }
         });
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

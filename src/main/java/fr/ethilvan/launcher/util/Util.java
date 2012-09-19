@@ -28,23 +28,36 @@ public final class Util {
         }
     }
 
-    public static void openURI(URI uri)
-            throws IOException, URISyntaxException {
-        Desktop.getDesktop().browse(uri);
+    public static void openURI(URI uri) {
+        try {
+            Desktop.getDesktop().browse(uri);
+        } catch (IOException exc) {
+            throw wrap(exc);
+        }
     }
 
-    public static void openURL(URL url)
-            throws IOException, URISyntaxException {
-        openURI(url.toURI());
+    public static void openURL(URL url) {
+        try {
+            openURI(url.toURI());
+        } catch (URISyntaxException exc) {
+            throw wrap(exc);
+        }
     }
 
-    public static void openEthilVanFR()
-            throws MalformedURLException, IOException, URISyntaxException {
-        openURI(new URI(ETHILVAN_FR));
+    public static void openEthilVanFR() {
+        try {
+            openURI(new URI(ETHILVAN_FR));
+        } catch (URISyntaxException exc) {
+            throw wrap(exc);
+        }
     }
 
     public static File getHomeDirectory() {
         return new File(System.getProperty("user.home", "."));
+    }
+
+    public static RuntimeException wrap(Throwable throwable) {
+        return new RuntimeException(throwable);
     }
 
     private Util() {

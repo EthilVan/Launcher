@@ -32,10 +32,14 @@ public class NewsDownloader extends HttpExchange {
         output = new ByteArrayOutputStream();
     }
 
-    public void download() throws Exception {
+    public void download() {
         HttpClient client = new HttpClient();
-        client.start();
-        client.send(this);
+        try {
+            client.start();
+            client.send(this);
+        } catch (Exception exc) {
+            throw Util.wrap(exc);
+        }
     }
 
     @Override
@@ -56,6 +60,7 @@ public class NewsDownloader extends HttpExchange {
         try {
             content.writeTo(output);
         } catch (IOException exc) {
+            throw Util.wrap(exc);
         }
         progressBar.setValue(progressBar.getValue() + length);
     }
@@ -66,6 +71,7 @@ public class NewsDownloader extends HttpExchange {
             newsPanel.displayNews(Util.urlFor(NEWS_URL),
                     output.toString("UTF-8"), progressBar);
         } catch (UnsupportedEncodingException exc) {
+            throw Util.wrap(exc);
         }
     }
 }

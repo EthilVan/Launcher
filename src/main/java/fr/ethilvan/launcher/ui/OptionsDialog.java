@@ -11,8 +11,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -126,11 +124,7 @@ public class OptionsDialog extends JDialog {
         directory.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event) {
-                try {
-                    Util.openURI(Launcher.get().getGameDirectory().toURI());
-                } catch (IOException _) {
-                } catch (URISyntaxException _) {
-                }
+                Util.openURI(Launcher.get().getGameDirectory().toURI());
             }
         });
 

@@ -1,13 +1,16 @@
 package fr.ethilvan.launcher.updater;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.client.HttpClient;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.DownloadDialog;
+import fr.ethilvan.launcher.util.Util;
 
 public class Updater {
 
@@ -33,12 +36,16 @@ public class Updater {
         if (tmpDir.exists()) {
             FileUtils.deleteQuietly(tmpDir);
         }
-        tmpDir.mkdir();
+        try {
+            FileUtils.forceMkdir(tmpDir);
+        } catch (IOException exc) {
+            throw Util.wrap(exc);
+        }
 
         try {
             client.start();
         } catch (Exception exc) {
-            exc.printStackTrace();
+            throw Util.wrap(exc); 
         }
 
         UpdateList updateList = new UpdateList(dialog) {
@@ -67,12 +74,12 @@ public class Updater {
     private void onDownloadComplete(DownloadInfo info) {
         try {
             File tmpFile = info.getTemp(tmpDir);
-            File file = new File(Launcher.get().getGameDirectory(),
+            File targetPath = new File(Launcher.get().getGameDirectory(),
                     info.getPath());
-            file.getParentFile().mkdirs();
-            FileUtils.copyFile(tmpFile, file);
+            InputStream input = new FileInputStream(tmpFile);
+            info.getFilter().filter(dialog, input, targetPath);
         } catch (IOException exc) {
-            exc.printStackTrace();
+            throw Util.wrap(exc);
         }
 
         if (--downloadsCount == 0) {
