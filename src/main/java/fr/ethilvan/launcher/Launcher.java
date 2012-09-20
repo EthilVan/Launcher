@@ -138,12 +138,9 @@ public class Launcher {
 
         try {
             if (session.login(passwordStr)) {
-                System.out.println("Logged in !");
-                //update(dialog);
-                launch(dialog, session, quick);
+                update(dialog, session, quick);
             } else {
-                System.out.println("Invalid login or password !");
-                dialog.dispose();
+                dialog.setLoginFailed();
             }
         } catch (IOException exc) {
             throw Util.wrap(exc);
@@ -154,14 +151,20 @@ public class Launcher {
         }
     }
 
-    public void update(TaskDialog dialog) {
+    public void update(final TaskDialog dialog, final LoginSession session,
+            final boolean quick) {
         final UpdateChecker checker = new UpdateChecker();
         if (!checker.needUpdate()) {
-            dialog.dispose();
+            launch(dialog, session, quick);
             return;
         }
 
-        Updater updater = new Updater(checker, dialog);
+        Updater updater = new Updater(checker, dialog) {
+            @Override
+            protected void onAllDownloadComplete() {
+                launch(dialog, session, quick);
+            }
+        };
         updater.perform();
     }
 

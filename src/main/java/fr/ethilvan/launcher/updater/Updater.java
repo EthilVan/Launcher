@@ -84,8 +84,11 @@ public class Updater {
 
         if (--downloadsCount == 0) {
             FileUtils.deleteQuietly(tmpDir);
-            dialog.dispose();
             updateChecker.updatePerformed();
+            onAllDownloadComplete();
         }
+    }
+
+    protected void onAllDownloadComplete() {
     }
 }
