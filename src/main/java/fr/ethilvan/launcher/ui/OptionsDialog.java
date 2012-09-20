@@ -159,7 +159,7 @@ public class OptionsDialog extends JDialog {
                 }
             });
 
-            forceUpdate.addItemListener(new ItemListener() {
+            latestLWJGL.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent event) {
                     Launcher.get().getOptions().setUseLatestLWJGL(

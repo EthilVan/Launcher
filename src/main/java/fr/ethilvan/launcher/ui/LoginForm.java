@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.config.Options;
 
 public class LoginForm extends JPanel {
 
@@ -54,10 +55,10 @@ public class LoginForm extends JPanel {
         providersC.gridx = 2;
         providersC.gridy = 0;
 
-        GridBagConstraints optionsC = new GridBagConstraints();
-        optionsC.insets = buttonInsets;
-        optionsC.gridx = 3;
-        optionsC.gridy = 0;
+        GridBagConstraints optionsBtnC = new GridBagConstraints();
+        optionsBtnC.insets = buttonInsets;
+        optionsBtnC.gridx = 3;
+        optionsBtnC.gridy = 0;
 
         GridBagConstraints passwordLabelC = new GridBagConstraints();
         passwordLabelC.fill = GridBagConstraints.HORIZONTAL;
@@ -102,23 +103,28 @@ public class LoginForm extends JPanel {
         usernameLabel.setLabelFor(username);
         passwordLabel.setLabelFor(password);
 
+        Options options = Launcher.get().getOptions();
+        String rememberedUsername = options.getUsername();
+        if (rememberedUsername != null) {
+            username.setText(rememberedUsername);
+            password.setText(options.getPassword());
+        }
 
-        JCheckBox rememberMe = new JCheckBox("Retenir le mot de passe");
+        final JCheckBox rememberMe = new JCheckBox("Retenir le mot de passe");
         rememberMe.setOpaque(false);
         rememberMe.setForeground(Color.WHITE);
         rememberMe.setBorder(null);
 
-        JComboBox providers = new JComboBox(
-                Launcher.get().getOptions().getProviders());
+        JComboBox providers = new JComboBox(options.getProviders());
         providers.setOpaque(false);
-        JButton options = new JButton("Options");
-        options.setOpaque(false);
+        JButton optionsBtn = new JButton("Options");
+        optionsBtn.setOpaque(false);
         JButton login = new JButton("Connexion");
         login.setOpaque(false);
         JButton quickLogin = new JButton("Connexion Rapide");
         quickLogin.setOpaque(false);
 
-        options.addActionListener(new ActionListener() {
+        optionsBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 new OptionsDialog(getRootPane()).setVisible(true);
             }
@@ -132,7 +138,8 @@ public class LoginForm extends JPanel {
                 new Thread(new Runnable() {
                     public void run() {
                         Launcher.get().login(dialog, username.getText(),
-                                password.getPassword(), 
+                                password.getPassword(),
+                                rememberMe.isSelected(),
                                 event.getActionCommand().contains("Rapide"));
                     }
                 }).start();
@@ -145,7 +152,7 @@ public class LoginForm extends JPanel {
 
         add(usernameLabel, usernameLabelC);
         add(username, usernameC);
-        add(options, optionsC);
+        add(optionsBtn, optionsBtnC);
         add(providers, providersC);
         add(passwordLabel, passwordLabelC);
         add(password, passwordC);

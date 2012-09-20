@@ -3,6 +3,9 @@ package fr.ethilvan.launcher;
 import java.applet.Applet;
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -18,6 +21,13 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import org.apache.commons.io.IOUtils;
+
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.sk89q.mclauncher.LoginSession;
 import com.sk89q.mclauncher.LoginSession.LoginException;
 import com.sk89q.mclauncher.LoginSession.OutdatedLauncherException;
@@ -95,7 +105,36 @@ public class Launcher {
                 + " (" + OS.get().name() +
                 "; +" + EthilVan.WEBSITE + ")");
         forceUpdate = false;
-        this.options = new Options();
+
+        File optionsFile = optionsFile();
+        if (optionsFile.exists()) {
+            FileReader reader = null;
+            try {
+                reader = new FileReader(optionsFile);
+                this.options = gson().fromJson(reader,
+                        Options.class);
+            } catch (JsonSyntaxException exc) {
+                throw Util.wrap(exc);
+            } catch (JsonIOException exc) {
+                throw Util.wrap(exc);
+            } catch (FileNotFoundException exc) {
+                throw Util.wrap(exc);
+            } finally {
+                IOUtils.closeQuietly(reader);
+            }
+        } else {
+            this.options = new Options();
+        }
+    }
+
+    private Gson gson() {
+        return new GsonBuilder().setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+                .create();
+    }
+
+    private File optionsFile() {
+        return new File(OS.get().getDataDir(), ".evlauncher.json");
     }
 
     public boolean getForceUpdate() {
@@ -127,8 +166,22 @@ public class Launcher {
         return file;
     }
 
+    public void saveOptions() {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(optionsFile());
+            gson().toJson(options, writer);
+        } catch (JsonIOException exc) {
+            throw Util.wrap(exc);
+        } catch (IOException exc) {
+            throw Util.wrap(exc);
+        } finally {
+            IOUtils.closeQuietly(writer);
+        }
+    }
+
     public void login(TaskDialog dialog, String name, char[] password,
-            boolean quick) {
+            boolean rememberMe, boolean quick) {
         dialog.setStatus("Logging in ...", null);
         LoginSession session = new LoginSession(name);
         String passwordStr = new String(password);
@@ -138,6 +191,10 @@ public class Launcher {
 
         try {
             if (session.login(passwordStr)) {
+                if (rememberMe) {
+                    options.rememberAccount(name, passwordStr);
+                }
+                saveOptions();
                 update(dialog, session, quick);
             } else {
                 dialog.setLoginFailed();
@@ -189,12 +246,13 @@ public class Launcher {
                 String server = options.getProvider().getServer();
                 String[] info = server.split(":");
                 params.put("server", info[0]);
-                params.put("port",  info.length > 1 ? info[1] : "25565");
+                params.put("port", info.length > 1 ? info[1] : "25565");
             }
 
             dialog.dispose();
             Launcher.frame.dispose();
-            GameAppletContainer container = new GameAppletContainer(params, applet);
+            GameAppletContainer container = new GameAppletContainer(params,
+                    applet);
             frame.start(container);
         } catch (ClassNotFoundException exc) {
             throw Util.wrap(exc);
@@ -232,7 +290,8 @@ public class Launcher {
 
         Class<?> minecraft;
         try {
-            minecraft = classLoader.loadClass("net.minecraft.client.Minecraft");
+            minecraft = classLoader.loadClass(
+                    "net.minecraft.client.Minecraft");
             Field[] fields = minecraft.getDeclaredFields();
             for (Field field : fields) {
                 if (Modifier.isStatic(field.getModifiers())
