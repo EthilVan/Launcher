@@ -9,7 +9,7 @@ public final class EthilVan {
     public static final String SERVER = "play.ethilvan.fr";
 
     public static Provider getProvider() {
-        return new Provider("Ethil Van", ".ethilvan",
+        return new Provider("Ethil Van", ".ethilvan2",
                 WEBSITE + "/launcher/version",
                 WEBSITE + "/launcher/list.json",
                 SERVER);
