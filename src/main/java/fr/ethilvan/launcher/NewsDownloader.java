@@ -13,11 +13,10 @@ import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
 import fr.ethilvan.launcher.ui.NewsPanel;
+import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.Util;
 
 public class NewsDownloader extends HttpExchange {
-
-    private static final String NEWS_URL = Util.ETHILVAN_FR + "/news/launcher";
 
     private final NewsPanel newsPanel;
     private final JProgressBar progressBar;
@@ -28,7 +27,7 @@ public class NewsDownloader extends HttpExchange {
         this.newsPanel = newsPanel;
         this.progressBar = progressBar;
 
-        setURL(NEWS_URL);
+        setURL(EthilVan.NEWS);
         output = new ByteArrayOutputStream();
     }
 
@@ -68,8 +67,8 @@ public class NewsDownloader extends HttpExchange {
     @Override
     protected void onResponseComplete() {
         try {
-            newsPanel.displayNews(Util.urlFor(NEWS_URL),
-                    output.toString("UTF-8"), progressBar);
+            newsPanel.displayNews(Util.urlFor(EthilVan.NEWS),
+                    output.toString(Util.UTF8), progressBar);
         } catch (UnsupportedEncodingException exc) {
             throw Util.wrap(exc);
         }

@@ -25,10 +25,12 @@ import com.sk89q.mclauncher.launch.GameAppletContainer;
 import com.sk89q.mclauncher.launch.GameFrame;
 import com.sk89q.mclauncher.security.X509KeyStore;
 
+import fr.ethilvan.launcher.config.Options;
 import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.ui.LauncherFrame;
 import fr.ethilvan.launcher.updater.UpdateChecker;
 import fr.ethilvan.launcher.updater.Updater;
+import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.OS;
 import fr.ethilvan.launcher.util.Util;
 
@@ -56,7 +58,6 @@ public class Launcher {
     public static void main(String[] args) {
         instance = new Launcher();
         SwingUtilities.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 frame = new LauncherFrame();
@@ -92,7 +93,7 @@ public class Launcher {
         System.setProperty("http.agent",
                 "EthilVanLauncher/" + VERSION
                 + " (" + OS.get().name() +
-                "; +" + Util.ETHILVAN_FR + ")");
+                "; +" + EthilVan.WEBSITE + ")");
         forceUpdate = false;
         this.options = new Options();
     }
@@ -111,7 +112,7 @@ public class Launcher {
 
     public File getGameDirectory() {
         File file = new File(OS.get().getDataDir(),
-                options.getEthilVanFolder());
+                options.getProvider().getDirectory());
 
         if (!file.exists()) {
             if (!file.mkdirs()) {
@@ -137,18 +138,18 @@ public class Launcher {
         try {
             if (session.login(passwordStr)) {
                 System.out.println("Logged in !");
-                //update(dialog);
-                launch(dialog, session);
+                update(dialog);
+                //launch(dialog, session);
             } else {
                 System.out.println("Invalid login or password !");
                 dialog.dispose();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (OutdatedLauncherException e) {
-            e.printStackTrace();
-        } catch (LoginException e) {
-            e.printStackTrace();
+        } catch (IOException exc) {
+            throw Util.wrap(exc);
+        } catch (OutdatedLauncherException exc) {
+            throw Util.wrap(exc);
+        } catch (LoginException exc) {
+            throw Util.wrap(exc);
         }
     }
 

@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -47,13 +48,13 @@ public class OptionsDialog extends JDialog {
         forceUpdateC.gridy = 0;
         panel.add(forceUpdate, forceUpdateC);
 
-        JToggleButton devMode = new JToggleButton("Mode développement");
-        devMode.setSelected(Launcher.get().getOptions().isDevMode());
-        GridBagConstraints devModeC = new GridBagConstraints();
-        devModeC.insets = new Insets(0, 4, 10, 0);
-        devModeC.gridx = 1;
-        devModeC.gridy = 0;
-        panel.add(devMode, devModeC);
+        JComboBox providers = new JComboBox(
+                Launcher.get().getOptions().getProviders());
+        GridBagConstraints providersC = new GridBagConstraints();
+        providersC.insets = new Insets(0, 4, 10, 0);
+        providersC.gridx = 1;
+        providersC.gridy = 0;
+        panel.add(providers, providersC);
 
         JLabel directoryLabel = new JLabel("Dossier du jeu : ",
                 SwingConstants.RIGHT);
@@ -110,11 +111,9 @@ public class OptionsDialog extends JDialog {
             }
         });
 
-        devMode.addItemListener(new ItemListener() {
+        providers.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
-                Launcher.get().getOptions().setDevMode(
-                        event.getStateChange() == ItemEvent.SELECTED);
                 directory.setText("<html><a href=\"\">"
                         + Launcher.get().getGameDirectory() + "</a></html>");
                 OptionsDialog.this.pack();

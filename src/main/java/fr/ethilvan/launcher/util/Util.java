@@ -10,7 +10,7 @@ import java.net.URL;
 
 public final class Util {
 
-    public static final String ETHILVAN_FR = "http://ethilvan.fr";
+    public final static String UTF8 = "UTF-8";
 
     public static URL urlFor(String url) {
         try {
@@ -46,7 +46,7 @@ public final class Util {
 
     public static void openEthilVanFR() {
         try {
-            openURI(new URI(ETHILVAN_FR));
+            openURI(new URI(EthilVan.WEBSITE));
         } catch (URISyntaxException exc) {
             throw wrap(exc);
         }

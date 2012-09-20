@@ -70,9 +70,9 @@ public class LoginSession {
         HttpsURLConnection conn = null;
 
         String params = String.format("user=%s&password=%s&version=%s",
-                URLEncoder.encode(username, "UTF-8"),
-                URLEncoder.encode(password, "UTF-8"),
-                URLEncoder.encode(LAUNCHER_VERSION, "UTF-8"));
+                URLEncoder.encode(username, Util.UTF8),
+                URLEncoder.encode(password, Util.UTF8),
+                URLEncoder.encode(LAUNCHER_VERSION, Util.UTF8));
 
         TrustManager[] trustManagers = new TrustManager[] {
                 Launcher.getMinecraftLoginCert()
@@ -106,7 +106,8 @@ public class LoginSession {
                 throw new IOException("Did not get expected 200 code");
             }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(), Util.UTF8));
 
             StringBuilder s = new StringBuilder();
             char[] buf = new char[1024];

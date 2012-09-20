@@ -16,14 +16,8 @@ import com.google.gson.GsonBuilder;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.TaskDialog;
-import fr.ethilvan.launcher.util.Util;
 
 public class UpdateList extends HttpExchange {
-
-    private static final String UPDATE_LIST_URL = Util.ETHILVAN_FR
-            + "/launcher/list.json";
-    private static final String DEV_UPDATE_LIST_URL = Util.ETHILVAN_FR
-            + "/launcher/listdev.json";
 
     private final TaskDialog dialog;
     private final BoundedRangeModel progress;
@@ -38,8 +32,7 @@ public class UpdateList extends HttpExchange {
 
     public void fetch(HttpClient client) {
         output = new ByteArrayOutputStream();
-        setURL(Launcher.get().getOptions().isDevMode() ?
-                DEV_UPDATE_LIST_URL : UPDATE_LIST_URL);
+        setURL(Launcher.get().getOptions().getProvider().getListUrl());
 
         dialog.setStatus("Fetching update list.", null);
         try {

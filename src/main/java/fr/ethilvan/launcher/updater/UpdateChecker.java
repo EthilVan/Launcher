@@ -17,8 +17,6 @@ import fr.ethilvan.launcher.util.Util;
 
 public class UpdateChecker {
 
-    private final static String REMOTE_VERSION_URL = Util.ETHILVAN_FR
-            + "/launcher/version";
     private final static String LOCAL_VERSION_FILE = "version";
 
     public UpdateChecker() {
@@ -68,7 +66,8 @@ public class UpdateChecker {
     private String getRemoteVersion() {
         BufferedReader reader = null;
         try {
-            URL url = Util.urlFor(REMOTE_VERSION_URL);
+            URL url = Util.urlFor(Launcher.get().getOptions().getProvider()
+                    .getVersionURL());
             InputStream stream = url.openStream();
             reader = new BufferedReader(new InputStreamReader(stream));
             return reader.readLine();
