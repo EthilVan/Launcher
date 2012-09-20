@@ -127,7 +127,8 @@ public class Launcher {
         return file;
     }
 
-    public void login(TaskDialog dialog, String name, char[] password) {
+    public void login(TaskDialog dialog, String name, char[] password,
+            boolean quick) {
         dialog.setStatus("Logging in ...", null);
         LoginSession session = new LoginSession(name);
         String passwordStr = new String(password);
@@ -138,8 +139,8 @@ public class Launcher {
         try {
             if (session.login(passwordStr)) {
                 System.out.println("Logged in !");
-                update(dialog);
-                //launch(dialog, session);
+                //update(dialog);
+                launch(dialog, session, quick);
             } else {
                 System.out.println("Invalid login or password !");
                 dialog.dispose();
@@ -164,7 +165,8 @@ public class Launcher {
         updater.perform();
     }
 
-    public void launch(TaskDialog dialog, LoginSession session) {
+    public void launch(TaskDialog dialog, LoginSession session,
+            boolean quick) {
         File dir = getGameDirectory();
         ClassLoader classLoader = setupClassLoader(dir);
 
@@ -180,6 +182,12 @@ public class Launcher {
             params.put("stand-alone", "true");
             params.put("username", session.getUsername());
             params.put("sessionid", session.getSessionId());
+            if (quick) {
+                String server = options.getProvider().getServer();
+                String[] info = server.split(":");
+                params.put("server", info[0]);
+                params.put("port",  info.length > 1 ? info[1] : "25565");
+            }
 
             dialog.dispose();
             Launcher.frame.dispose();

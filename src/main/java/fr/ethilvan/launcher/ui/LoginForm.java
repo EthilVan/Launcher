@@ -54,6 +54,11 @@ public class LoginForm extends JPanel {
         providersC.gridx = 2;
         providersC.gridy = 0;
 
+        GridBagConstraints optionsC = new GridBagConstraints();
+        optionsC.insets = buttonInsets;
+        optionsC.gridx = 3;
+        optionsC.gridy = 0;
+
         GridBagConstraints passwordLabelC = new GridBagConstraints();
         passwordLabelC.fill = GridBagConstraints.HORIZONTAL;
         passwordLabelC.insets = insets;
@@ -66,11 +71,12 @@ public class LoginForm extends JPanel {
         passwordC.gridx = 1;
         passwordC.gridy = 1;
 
-        GridBagConstraints optionsC = new GridBagConstraints();
-        optionsC.fill = GridBagConstraints.HORIZONTAL;
-        optionsC.insets = buttonInsets;
-        optionsC.gridx = 2;
-        optionsC.gridy = 1;
+        GridBagConstraints loginC = new GridBagConstraints();
+        loginC.fill = GridBagConstraints.HORIZONTAL;
+        loginC.insets = buttonInsets;
+        loginC.gridx = 2;
+        loginC.gridy = 1;
+        loginC.gridwidth = 2;
 
         GridBagConstraints rememberMeC = new GridBagConstraints();
         rememberMeC.anchor = GridBagConstraints.LINE_END;
@@ -78,11 +84,12 @@ public class LoginForm extends JPanel {
         rememberMeC.gridx = 1;
         rememberMeC.gridy = 2;
 
-        GridBagConstraints loginC = new GridBagConstraints();
-        loginC.fill = GridBagConstraints.HORIZONTAL;
-        loginC.insets = buttonInsets;
-        loginC.gridx = 2;
-        loginC.gridy = 2;
+        GridBagConstraints quickLoginC = new GridBagConstraints();
+        quickLoginC.fill = GridBagConstraints.HORIZONTAL;
+        quickLoginC.insets = buttonInsets;
+        quickLoginC.gridx = 2;
+        quickLoginC.gridy = 2;
+        quickLoginC.gridwidth = 2;
 
         JLabel usernameLabel = new JLabel("Identifiant :",
                 SwingConstants.RIGHT);
@@ -90,8 +97,6 @@ public class LoginForm extends JPanel {
                 SwingConstants.RIGHT);
         final JTextField username = new JTextField(16);
         final JPasswordField password = new JPasswordField(16);
-        JComboBox providers = new JComboBox(
-                Launcher.get().getOptions().getProviders());
         usernameLabel.setForeground(Color.WHITE);
         passwordLabel.setForeground(Color.WHITE);
         usernameLabel.setLabelFor(username);
@@ -103,10 +108,15 @@ public class LoginForm extends JPanel {
         rememberMe.setForeground(Color.WHITE);
         rememberMe.setBorder(null);
 
+        JComboBox providers = new JComboBox(
+                Launcher.get().getOptions().getProviders());
+        providers.setOpaque(false);
         JButton options = new JButton("Options");
         options.setOpaque(false);
         JButton login = new JButton("Connexion");
         login.setOpaque(false);
+        JButton quickLogin = new JButton("Connexion Rapide");
+        quickLogin.setOpaque(false);
 
         options.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -114,28 +124,33 @@ public class LoginForm extends JPanel {
             }
         });
 
-        login.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        ActionListener loginListener = new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
                 final TaskDialog dialog =
                         new TaskDialog(getRootPane());
                 dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
                 new Thread(new Runnable() {
                     public void run() {
                         Launcher.get().login(dialog, username.getText(),
-                                password.getPassword());
+                                password.getPassword(), 
+                                event.getActionCommand().contains("Rapide"));
                     }
                 }).start();
                 dialog.setVisible(true);
             }
-        });
+        };
+
+        login.addActionListener(loginListener);
+        quickLogin.addActionListener(loginListener);
 
         add(usernameLabel, usernameLabelC);
         add(username, usernameC);
         add(options, optionsC);
+        add(providers, providersC);
         add(passwordLabel, passwordLabelC);
         add(password, passwordC);
-        add(providers, providersC);
-        add(rememberMe, rememberMeC);
         add(login, loginC);
+        add(rememberMe, rememberMeC);
+        add(quickLogin, quickLoginC);
     }
 }
