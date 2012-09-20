@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.client.HttpClient;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.TaskDialog;
+import fr.ethilvan.launcher.util.OS;
 import fr.ethilvan.launcher.util.Util;
 
 public class Updater {
@@ -59,7 +62,16 @@ public class Updater {
 
     private void downloadAll(DownloadInfo[] downloadsInfo) {
         downloadsCount = downloadsInfo.length;
+        Set<String> tags = new HashSet<String>();
+        tags.add(OS.get().name().toLowerCase());
+        tags.add(Launcher.get().getOptions().getUseLatestLWJGL() ?
+                "lwjgl" : "lwjglold");
         for (DownloadInfo downloadInfo : downloadsInfo) {
+            if (!downloadInfo.isValid(tags)) {
+                downloadsCount--;
+                continue;
+            }
+
             Download download = new Download(dialog, downloadInfo) {
                 @Override
                 protected void onResponseComplete() {
