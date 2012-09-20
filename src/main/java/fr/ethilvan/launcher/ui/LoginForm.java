@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -34,6 +35,7 @@ public class LoginForm extends JPanel {
 
         Insets insets = new Insets(2, 4, 2, 0);
         Insets buttonInsets = new Insets(2, 10, 2, 0);
+
         GridBagConstraints usernameLabelC = new GridBagConstraints();
         usernameLabelC.fill = GridBagConstraints.HORIZONTAL;
         usernameLabelC.insets = insets;
@@ -46,11 +48,11 @@ public class LoginForm extends JPanel {
         usernameC.gridx = 1;
         usernameC.gridy = 0;
 
-        GridBagConstraints optionsC = new GridBagConstraints();
-        optionsC.fill = GridBagConstraints.HORIZONTAL;
-        optionsC.insets = buttonInsets;
-        optionsC.gridx = 2;
-        optionsC.gridy = 0;
+        GridBagConstraints providersC = new GridBagConstraints();
+        providersC.fill = GridBagConstraints.HORIZONTAL;
+        providersC.insets = buttonInsets;
+        providersC.gridx = 2;
+        providersC.gridy = 0;
 
         GridBagConstraints passwordLabelC = new GridBagConstraints();
         passwordLabelC.fill = GridBagConstraints.HORIZONTAL;
@@ -64,17 +66,23 @@ public class LoginForm extends JPanel {
         passwordC.gridx = 1;
         passwordC.gridy = 1;
 
-        GridBagConstraints loginC = new GridBagConstraints();
-        loginC.fill = GridBagConstraints.HORIZONTAL;
-        loginC.insets = buttonInsets;
-        loginC.gridx = 2;
-        loginC.gridy = 1;
+        GridBagConstraints optionsC = new GridBagConstraints();
+        optionsC.fill = GridBagConstraints.HORIZONTAL;
+        optionsC.insets = buttonInsets;
+        optionsC.gridx = 2;
+        optionsC.gridy = 1;
 
         GridBagConstraints rememberMeC = new GridBagConstraints();
         rememberMeC.anchor = GridBagConstraints.LINE_END;
         rememberMeC.insets = new Insets(6, 0, 2, 0);
-        rememberMeC.gridx = 2;
+        rememberMeC.gridx = 1;
         rememberMeC.gridy = 2;
+
+        GridBagConstraints loginC = new GridBagConstraints();
+        loginC.fill = GridBagConstraints.HORIZONTAL;
+        loginC.insets = buttonInsets;
+        loginC.gridx = 2;
+        loginC.gridy = 2;
 
         JLabel usernameLabel = new JLabel("Identifiant :",
                 SwingConstants.RIGHT);
@@ -82,10 +90,13 @@ public class LoginForm extends JPanel {
                 SwingConstants.RIGHT);
         final JTextField username = new JTextField(16);
         final JPasswordField password = new JPasswordField(16);
+        JComboBox providers = new JComboBox(
+                Launcher.get().getOptions().getProviders());
         usernameLabel.setForeground(Color.WHITE);
         passwordLabel.setForeground(Color.WHITE);
         usernameLabel.setLabelFor(username);
         passwordLabel.setLabelFor(password);
+
 
         JCheckBox rememberMe = new JCheckBox("Retenir le mot de passe");
         rememberMe.setOpaque(false);
@@ -123,7 +134,8 @@ public class LoginForm extends JPanel {
         add(options, optionsC);
         add(passwordLabel, passwordLabelC);
         add(password, passwordC);
-        add(login, loginC);
+        add(providers, providersC);
         add(rememberMe, rememberMeC);
+        add(login, loginC);
     }
 }

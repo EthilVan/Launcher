@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -28,6 +29,7 @@ public class NewsPanel extends JPanel {
 
     private final Image bg;
     private final JTextPane textPane;
+    private final JScrollPane newsScroll;
 
     public NewsPanel() {
         super();
@@ -46,6 +48,7 @@ public class NewsPanel extends JPanel {
 
         final JProgressBar progressBar = new JProgressBar();
         this.textPane = new JTextPane();
+        this.newsScroll = new JScrollPane(textPane);
 
         build(progressBar);
 
@@ -75,7 +78,6 @@ public class NewsPanel extends JPanel {
         progressPane.add(progressBar);
         add(progressPane);
 
-        textPane.setVisible(false);
         textPane.setOpaque(false);
         textPane.setEditable(false);
         textPane.setContentType("text/html;charset=utf-8");
@@ -99,9 +101,10 @@ public class NewsPanel extends JPanel {
             }
         });
 
-        JScrollPane newsScroll = new JScrollPane(textPane);
+        newsScroll.setBorder(BorderFactory.createEmptyBorder());
         newsScroll.getViewport().setOpaque(false);
         newsScroll.setOpaque(false);
+        newsScroll.setVisible(false);
         add(newsScroll);
     }
 
@@ -112,7 +115,7 @@ public class NewsPanel extends JPanel {
         textPane.setCaretPosition(0);
 
         progressBar.getParent().setVisible(false);
-        textPane.setVisible(true);
+        newsScroll.setVisible(true);
     }
 
     @Override
