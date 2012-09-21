@@ -34,7 +34,6 @@ public class GameAppletContainer extends Applet implements AppletStub {
 
     private Map<String, String> parameters;
     private Applet applet;
-    private int context = 0;
     private boolean active = false;
     
     public GameAppletContainer(Map<String, String> parameters, Applet applet) {
@@ -59,17 +58,13 @@ public class GameAppletContainer extends Applet implements AppletStub {
 
     @Override
     public boolean isActive() {
-        if (this.context == 0) {
-            this.context = -1;
-            try {
-                if (getAppletContext() != null)
-                    this.context = 1;
-            } catch (Exception localException) {
-            }
-        }
-        if (this.context == -1)
-            return this.active;
-        return super.isActive();
+        return active;
+    }
+
+    @Override
+    public void stop() {
+        active = false;
+        super.stop();
     }
 
     @Override
@@ -83,19 +78,10 @@ public class GameAppletContainer extends Applet implements AppletStub {
 
     @Override
     public String getParameter(String name) {
-        String custom = (String) parameters.get(name);
-        if (custom != null)
-            return custom;
-        try {
-            return super.getParameter(name);
-        } catch (Exception e) {
-            parameters.put(name, null);
-        }
-        return null;
+        return (String) parameters.get(name);
     }
 
     @Override
     public void appletResize(int width, int height) {
     }
-
 }
