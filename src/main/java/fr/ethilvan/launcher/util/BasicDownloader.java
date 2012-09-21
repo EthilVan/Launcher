@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
-public abstract class BasicDownloader<T extends OutputStream>
+public class BasicDownloader<T extends OutputStream>
         extends HttpExchange {
 
     private final T output;

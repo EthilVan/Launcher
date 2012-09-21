@@ -122,7 +122,7 @@ public class Launcher {
             FileReader reader = null;
             try {
                 reader = new FileReader(optionsFile);
-                this.options = gson().fromJson(reader,
+                this.options = getGson().fromJson(reader,
                         Options.class);
             } catch (JsonSyntaxException exc) {
                 throw Util.wrap(exc);
@@ -140,7 +140,7 @@ public class Launcher {
         forceUpdate = false;
     }
 
-    private Gson gson() {
+    public Gson getGson() {
         return new GsonBuilder().setPrettyPrinting()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
                 .create();
@@ -158,7 +158,7 @@ public class Launcher {
     }
 
     private File optionsFile() {
-        return new File(OS.get().getDataDir(), ".evlauncher.json");
+        return new File(getSettingsDir(), "config.json");
     }
 
     public Options getOptions() {
@@ -202,7 +202,7 @@ public class Launcher {
         FileWriter writer = null;
         try {
             writer = new FileWriter(optionsFile());
-            gson().toJson(options, writer);
+            getGson().toJson(options, writer);
         } catch (JsonIOException exc) {
             throw Util.wrap(exc);
         } catch (IOException exc) {

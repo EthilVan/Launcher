@@ -19,7 +19,8 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.NewsDownloader;
+import fr.ethilvan.launcher.news.ImageCache;
+import fr.ethilvan.launcher.news.NewsFetcher;
 import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.Util;
 
@@ -55,13 +56,8 @@ public class NewsPanel extends JPanel {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                NewsDownloader newsDownloader =
-                        new NewsDownloader(NewsPanel.this, progressBar);
-                try {
-                    Launcher.get().download(newsDownloader);
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                }
+                NewsFetcher newsFetcher = new NewsFetcher();
+                newsFetcher.fetch(NewsPanel.this, progressBar);
             }
         }).start();
     }
@@ -110,11 +106,13 @@ public class NewsPanel extends JPanel {
         add(newsScroll);
     }
 
-    public void displayNews(String news, JProgressBar progressBar) {
+    public void displayNews(ImageCache cacheMap, String news,
+            JProgressBar progressBar) {
+        textPane.getDocument().putProperty("imageCache", cacheMap);
         textPane.setText(news.toString());
         textPane.setCaretPosition(0);
 
-        remove(progressBar.getParent());
+        progressBar.setVisible(false);
         newsScroll.setVisible(true);
     }
 
