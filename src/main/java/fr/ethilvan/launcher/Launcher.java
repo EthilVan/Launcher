@@ -182,7 +182,7 @@ public class Launcher {
 
     public void login(TaskDialog dialog, String name, char[] password,
             boolean rememberMe, boolean quick) {
-        dialog.setStatus("Logging in ...", null);
+        dialog.setStatus("Authentification ...", null);
         LoginSession session = new LoginSession(name);
         String passwordStr = new String(password);
         for (int i = 0; i < password.length; i++) {
@@ -211,7 +211,7 @@ public class Launcher {
     public void update(final TaskDialog dialog, final LoginSession session,
             final boolean quick) {
         final UpdateChecker checker = new UpdateChecker();
-        if (!checker.needUpdate()) {
+        if (!forceUpdate && !checker.needUpdate(dialog)) {
             launch(dialog, session, quick);
             return;
         }

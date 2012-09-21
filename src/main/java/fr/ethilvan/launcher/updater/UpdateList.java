@@ -19,6 +19,8 @@ import fr.ethilvan.launcher.ui.TaskDialog;
 
 public class UpdateList extends HttpExchange {
 
+    private static final String STATUS = "Récuperation des téléchargements.";
+
     private final TaskDialog dialog;
     private final BoundedRangeModel progress;
 
@@ -34,7 +36,7 @@ public class UpdateList extends HttpExchange {
         output = new ByteArrayOutputStream();
         setURL(Launcher.get().getOptions().getProvider().getListUrl());
 
-        dialog.setStatus("Fetching update list.", null);
+        dialog.setStatus(STATUS, null);
         try {
             client.send(this);
         } catch (IOException exc) {
@@ -49,13 +51,14 @@ public class UpdateList extends HttpExchange {
             progress.setMinimum(0);
             progress.setMaximum(length);
             progress.setValue(0);
-            dialog.setStatus("Fetching update list.", progress);
+            dialog.setStatus(STATUS, progress);
         }
     }
 
     @Override
     protected void onResponseContent(Buffer content) {
         progress.setValue(progress.getValue() + content.length());
+        dialog.setStatus(STATUS, progress);
         try {
             content.writeTo(output);
         } catch (IOException exc) {

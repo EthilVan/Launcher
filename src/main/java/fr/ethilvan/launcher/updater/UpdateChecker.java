@@ -13,6 +13,7 @@ import java.net.URL;
 import org.apache.commons.io.IOUtils;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.util.Util;
 
 public class UpdateChecker {
@@ -22,10 +23,8 @@ public class UpdateChecker {
     public UpdateChecker() {
     }
 
-    public boolean needUpdate() {
-        if (Launcher.get().getForceUpdate()) {
-            return true;
-        }
+    public boolean needUpdate(TaskDialog dialog) {
+        dialog.setStatus("Vérification des mises à jour.", null);
 
         String version = getLocalVersion();
         if (version == null) {

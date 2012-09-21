@@ -30,11 +30,9 @@ public class Updater {
         this.client = new HttpClient();
     }
 
-    public boolean needUpdate() {
-        return updateChecker.needUpdate();
-    }
-
     public void perform() {
+        dialog.setStatus("Mise à jour", null);
+
         tmpDir = new File(Launcher.get().getGameDirectory(), ".tmp");
         if (tmpDir.exists()) {
             FileUtils.deleteQuietly(tmpDir);

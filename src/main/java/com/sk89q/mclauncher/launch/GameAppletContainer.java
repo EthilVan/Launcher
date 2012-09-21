@@ -40,13 +40,13 @@ public class GameAppletContainer extends Applet implements AppletStub {
     public GameAppletContainer(Map<String, String> parameters, Applet applet) {
         this.parameters = parameters;
         this.applet = applet;
+        applet.setStub(this);
         setLayout(new BorderLayout());
     }
     
     @Override
     public void start() {
         logger.info("Starting " + applet.getClass().getCanonicalName());
-        applet.setStub(this);
         applet.setSize(getWidth(), getHeight());
         add(applet, BorderLayout.CENTER);
         logger.info("Initializing Minecraft...");

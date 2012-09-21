@@ -50,7 +50,8 @@ public enum DownloadFilter {
                         continue;
                     }
 
-                    dialog.setStatus("Uncompressing " + entry.getName(), null);
+                    dialog.setStatus("Décompression de " + entry.getName(),
+                            null);
                     File targetFile = new File(targetPath, entry.getName());
                     FileUtils.forceMkdir(targetFile.getParentFile());
                     OutputStream output = new FileOutputStream(targetFile);

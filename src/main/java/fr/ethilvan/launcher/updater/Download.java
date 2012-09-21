@@ -28,7 +28,7 @@ public class Download extends HttpExchange {
         super();
         this.dialog = dialog;
         this.info = info;
-        this.title = "Downloading " + info.getName() + " ...";
+        this.title = "Téléchargement de " + info.getName() + " ...";
         this.progress = new DefaultBoundedRangeModel();
     }
 
