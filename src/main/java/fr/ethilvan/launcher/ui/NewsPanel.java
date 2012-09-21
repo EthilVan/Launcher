@@ -112,7 +112,7 @@ public class NewsPanel extends JPanel {
         textPane.setText(news.toString());
         textPane.setCaretPosition(0);
 
-        progressBar.setVisible(false);
+        progressBar.getParent().setVisible(false);
         newsScroll.setVisible(true);
     }
 
