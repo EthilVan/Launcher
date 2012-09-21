@@ -36,11 +36,7 @@ public class UpdateList extends HttpExchange {
         setURL(Launcher.get().getOptions().getProvider().getListUrl());
 
         dialog.setStatus(STATUS, null);
-        try {
-            Launcher.get().getHttpClient().send(this);
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        }
+        Launcher.get().download(this);
     }
 
     @Override

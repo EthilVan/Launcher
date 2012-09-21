@@ -21,8 +21,10 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.HttpExchange;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -144,12 +146,19 @@ public class Launcher {
                 .create();
     }
 
-    private File optionsFile() {
-        return new File(OS.get().getDataDir(), ".evlauncher.json");
+    public File getSettingsDir() {
+        File dir = new File(OS.get().getDataDir(), ".evlauncher");
+        try {
+            FileUtils.forceMkdir(dir);
+        } catch (IOException exc) {
+            throw Util.wrap(exc);
+        }
+
+        return dir;
     }
 
-    public HttpClient getHttpClient() {
-        return client;
+    private File optionsFile() {
+        return new File(OS.get().getDataDir(), ".evlauncher.json");
     }
 
     public Options getOptions() {
@@ -162,6 +171,14 @@ public class Launcher {
 
     public void setForceUpdate(boolean forceUpdate) {
         this.forceUpdate = forceUpdate;
+    }
+
+    public void download(HttpExchange exchange) {
+        try {
+            client.send(exchange);
+        } catch (IOException exc) {
+            throw Util.wrap(exc);
+        }
     }
 
     public File getGameDirectory() {

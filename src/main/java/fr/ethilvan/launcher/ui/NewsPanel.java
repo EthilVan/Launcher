@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -21,6 +20,7 @@ import javax.swing.text.Document;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.NewsDownloader;
+import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.Util;
 
 public class NewsPanel extends JPanel {
@@ -58,7 +58,7 @@ public class NewsPanel extends JPanel {
                 NewsDownloader newsDownloader =
                         new NewsDownloader(NewsPanel.this, progressBar);
                 try {
-                    newsDownloader.download();
+                    Launcher.get().download(newsDownloader);
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
@@ -81,6 +81,8 @@ public class NewsPanel extends JPanel {
         textPane.setOpaque(false);
         textPane.setEditable(false);
         textPane.setContentType("text/html;charset=utf-8");
+        textPane.getDocument().putProperty(
+                Document.StreamDescriptionProperty, EthilVan.NEWS);
 
         textPane.addHyperlinkListener(new HyperlinkListener() {
             @Override
@@ -108,13 +110,11 @@ public class NewsPanel extends JPanel {
         add(newsScroll);
     }
 
-    public void displayNews(URL url, String news, JProgressBar progressBar) {
-        textPane.getDocument().putProperty(
-                Document.StreamDescriptionProperty, url);
+    public void displayNews(String news, JProgressBar progressBar) {
         textPane.setText(news.toString());
         textPane.setCaretPosition(0);
 
-        progressBar.getParent().setVisible(false);
+        remove(progressBar.getParent());
         newsScroll.setVisible(true);
     }
 

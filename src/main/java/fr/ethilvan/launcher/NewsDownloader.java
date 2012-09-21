@@ -1,71 +1,56 @@
 package fr.ethilvan.launcher;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JProgressBar;
 
-import org.eclipse.jetty.client.HttpExchange;
-import org.eclipse.jetty.io.Buffer;
-
 import fr.ethilvan.launcher.ui.NewsPanel;
+import fr.ethilvan.launcher.util.BasicDownloader;
 import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.Util;
 
-public class NewsDownloader extends HttpExchange {
+public class NewsDownloader extends BasicDownloader<ByteArrayOutputStream> {
 
     private final NewsPanel newsPanel;
     private final JProgressBar progressBar;
-    private final ByteArrayOutputStream output;
 
     public NewsDownloader(NewsPanel newsPanel, JProgressBar progressBar) {
-        super();
+        super(EthilVan.NEWS, new ByteArrayOutputStream());
         this.newsPanel = newsPanel;
         this.progressBar = progressBar;
-
-        setURL(EthilVan.NEWS);
-        output = new ByteArrayOutputStream();
-    }
-
-    public void download() {
-        try {
-            Launcher.get().getHttpClient().send(this);
-        } catch (IOException exc) {
-            throw Util.wrap(exc);
-        }
     }
 
     @Override
-    protected void onResponseHeader(Buffer name, Buffer value) {
-        if (name.toString().equals("Content-Length")) {
-            int length = Integer.parseInt(value.toString());
-            BoundedRangeModel range = new DefaultBoundedRangeModel(0, 0, 0,
-                    (int) length);
-            progressBar.setIndeterminate(false);
-            progressBar.setModel(range);
-            progressBar.setValue(0);
-        }
+    protected void onError(int code, String reason) {
+        cancel();
+        newsPanel.displayNews("<html><b><center>"
+               + "Impossible d'afficher les news. ("
+               + code + ": " + reason
+               + ")</center></b></html>",
+               progressBar);
     }
 
     @Override
-    protected void onResponseContent(Buffer content) {
-        int length = content.length();
-        try {
-            content.writeTo(output);
-        } catch (IOException exc) {
-            throw Util.wrap(exc);
-        }
-        progressBar.setValue(progressBar.getValue() + length);
+    protected void onLengthKnown(int length) {
+        BoundedRangeModel range = new DefaultBoundedRangeModel(0, 0, 0,
+                length);
+        progressBar.setIndeterminate(false);
+        progressBar.setModel(range);
+        progressBar.setValue(0);
     }
 
     @Override
-    protected void onResponseComplete() {
+    protected void onProgress(int progress) {
+        progressBar.setValue(progressBar.getValue() + progress);
+    }
+
+    @Override
+    protected void onComplete(ByteArrayOutputStream output) {
         try {
-            newsPanel.displayNews(Util.urlFor(EthilVan.NEWS),
-                    output.toString(Util.UTF8), progressBar);
+            newsPanel.displayNews(output.toString(Util.UTF8), progressBar);
         } catch (UnsupportedEncodingException exc) {
             throw Util.wrap(exc);
         }
