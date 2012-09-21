@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
 public class TaskDialog extends JDialog {
 
@@ -66,25 +67,35 @@ public class TaskDialog extends JDialog {
         setLocationRelativeTo(frame);
     }
 
-    public void setStatus(String text, BoundedRangeModel model) {
-        label.setText(text);
-        if (model == null) {
-            progressBar.setIndeterminate(true);
-        } else {
-            progressBar.setIndeterminate(false);
-            progressBar.setModel(model);
-        }
+    public void setStatus(final String text, final BoundedRangeModel model) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                label.setText(text);
+                if (model == null) {
+                    progressBar.setIndeterminate(true);
+                } else {
+                    progressBar.setIndeterminate(false);
+                    progressBar.setModel(model);
+                }
 
-        pack();
-        setLocationRelativeTo(frame);
+                pack();
+                setLocationRelativeTo(frame);
+            }
+        });
     }
 
     public void setLoginFailed() {
-        label.setText("Nom d'utilisateur ou mot de passe invalide");
-        progressBar.setVisible(false);
-        close.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                label.setText("Nom d'utilisateur ou mot de passe invalide");
+                progressBar.setVisible(false);
+                close.setVisible(true);
 
-        pack();
-        setLocationRelativeTo(frame);
+                pack();
+                setLocationRelativeTo(frame);
+            }
+        });
     }
 }

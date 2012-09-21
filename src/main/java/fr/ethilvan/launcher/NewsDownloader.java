@@ -8,7 +8,6 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JProgressBar;
 
-import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
@@ -32,11 +31,9 @@ public class NewsDownloader extends HttpExchange {
     }
 
     public void download() {
-        HttpClient client = new HttpClient();
         try {
-            client.start();
-            client.send(this);
-        } catch (Exception exc) {
+            Launcher.get().getHttpClient().send(this);
+        } catch (IOException exc) {
             throw Util.wrap(exc);
         }
     }

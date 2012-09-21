@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.client.HttpClient;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.TaskDialog;
@@ -18,16 +17,15 @@ import fr.ethilvan.launcher.util.Util;
 public class Updater {
 
     private final TaskDialog dialog;
-    private final HttpClient client;
     private final UpdateChecker updateChecker;
 
     private File tmpDir;
     private int downloadsCount;
+    private boolean done = false; 
 
     public Updater(UpdateChecker checker, TaskDialog dialog) {
         this.updateChecker = checker;
         this.dialog = dialog;
-        this.client = new HttpClient();
     }
 
     public void perform() {
@@ -43,19 +41,14 @@ public class Updater {
             throw Util.wrap(exc);
         }
 
+        UpdateList updateList = new UpdateList(dialog);
+        updateList.fetch();
         try {
-            client.start();
-        } catch (Exception exc) {
-            throw Util.wrap(exc); 
+            updateList.waitForDone();
+        } catch (InterruptedException _) {
         }
 
-        UpdateList updateList = new UpdateList(dialog) {
-            @Override
-            protected void onResponseComplete() {
-                downloadAll(getDownloads());
-            }
-        };
-        updateList.fetch(client);
+        downloadAll(updateList.getDownloads());
     }
 
     private void downloadAll(DownloadInfo[] downloadsInfo) {
@@ -77,7 +70,14 @@ public class Updater {
                     onDownloadComplete(info);
                 }
             };
-            download.start(client, tmpDir);
+            download.start(tmpDir);
+        }
+
+        while (!done) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException _) {
+            }
         }
     }
 
@@ -95,10 +95,7 @@ public class Updater {
         if (--downloadsCount == 0) {
             FileUtils.deleteQuietly(tmpDir);
             updateChecker.updatePerformed();
-            onAllDownloadComplete();
+            done = true;
         }
-    }
-
-    protected void onAllDownloadComplete() {
     }
 }

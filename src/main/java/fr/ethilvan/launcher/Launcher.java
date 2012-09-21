@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jetty.client.HttpClient;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -96,15 +97,23 @@ public class Launcher {
         return keyStore;
     }
 
-    private boolean forceUpdate;
+    private final HttpClient client;
     private final Options options;
+
+    private boolean forceUpdate;
 
     public Launcher() {
         System.setProperty("http.agent",
                 "EthilVanLauncher/" + VERSION
                 + " (" + OS.get().name() +
                 "; +" + EthilVan.WEBSITE + ")");
-        forceUpdate = false;
+
+        client = new HttpClient();
+        try {
+            client.start();
+        } catch (Exception exc) {
+            throw Util.wrap(exc);
+        }
 
         File optionsFile = optionsFile();
         if (optionsFile.exists()) {
@@ -125,6 +134,8 @@ public class Launcher {
         } else {
             this.options = new Options();
         }
+
+        forceUpdate = false;
     }
 
     private Gson gson() {
@@ -137,16 +148,20 @@ public class Launcher {
         return new File(OS.get().getDataDir(), ".evlauncher.json");
     }
 
+    public HttpClient getHttpClient() {
+        return client;
+    }
+
+    public Options getOptions() {
+        return options;
+    }
+
     public boolean getForceUpdate() {
         return forceUpdate;
     }
 
     public void setForceUpdate(boolean forceUpdate) {
         this.forceUpdate = forceUpdate;
-    }
-
-    public Options getOptions() {
-        return options;
     }
 
     public File getGameDirectory() {
@@ -208,21 +223,17 @@ public class Launcher {
         }
     }
 
-    public void update(final TaskDialog dialog, final LoginSession session,
-            final boolean quick) {
+    public void update(TaskDialog dialog, LoginSession session,
+            boolean quick) {
         final UpdateChecker checker = new UpdateChecker();
         if (!forceUpdate && !checker.needUpdate(dialog)) {
             launch(dialog, session, quick);
             return;
         }
 
-        Updater updater = new Updater(checker, dialog) {
-            @Override
-            protected void onAllDownloadComplete() {
-                launch(dialog, session, quick);
-            }
-        };
+        Updater updater = new Updater(checker, dialog);
         updater.perform();
+        launch(dialog, session, quick);
     }
 
     public void launch(TaskDialog dialog, LoginSession session,
@@ -252,6 +263,12 @@ public class Launcher {
 
             dialog.dispose();
             Launcher.frame.dispose();
+            try {
+                client.stop();
+            } catch (Exception exc) {
+                throw Util.wrap(exc);
+            }
+
             GameAppletContainer container = new GameAppletContainer(params,
                     applet);
             frame.start(container);

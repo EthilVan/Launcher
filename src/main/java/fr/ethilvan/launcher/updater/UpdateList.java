@@ -7,7 +7,6 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
@@ -32,13 +31,13 @@ public class UpdateList extends HttpExchange {
         this.progress = new DefaultBoundedRangeModel();
     }
 
-    public void fetch(HttpClient client) {
+    public void fetch() {
         output = new ByteArrayOutputStream();
         setURL(Launcher.get().getOptions().getProvider().getListUrl());
 
         dialog.setStatus(STATUS, null);
         try {
-            client.send(this);
+            Launcher.get().getHttpClient().send(this);
         } catch (IOException exc) {
             exc.printStackTrace();
         }

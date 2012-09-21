@@ -9,10 +9,10 @@ import javax.swing.DefaultBoundedRangeModel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
+import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.TaskDialog;
 
 public class Download extends HttpExchange {
@@ -32,7 +32,7 @@ public class Download extends HttpExchange {
         this.progress = new DefaultBoundedRangeModel();
     }
 
-    public void start(HttpClient client, File tmpDir) {
+    public void start(File tmpDir) {
         try {
             File tmpFile = info.getTemp(tmpDir);
             output = FileUtils.openOutputStream(tmpFile);
@@ -43,7 +43,7 @@ public class Download extends HttpExchange {
         dialog.setStatus(title, null);
         setURL(info.getUrl());
         try {
-            client.send(this);
+            Launcher.get().getHttpClient().send(this);
         } catch (IOException exc) {
             exc.printStackTrace();
         }
