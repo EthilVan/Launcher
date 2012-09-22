@@ -65,7 +65,7 @@ public class UpdateChecker {
     private String getRemoteVersion() {
         BufferedReader reader = null;
         try {
-            URL url = Util.urlFor(Launcher.get().getConfig().getProvider()
+            URL url = Util.urlFor(Launcher.get().getConfig().getMode()
                     .getVersionURL());
             InputStream stream = url.openStream();
             reader = new BufferedReader(new InputStreamReader(stream));

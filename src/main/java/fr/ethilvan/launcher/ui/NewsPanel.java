@@ -19,9 +19,9 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.Provider;
 import fr.ethilvan.launcher.news.ImageCache;
 import fr.ethilvan.launcher.news.NewsFetcher;
-import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.Util;
 
 public class NewsPanel extends JPanel {
@@ -78,7 +78,7 @@ public class NewsPanel extends JPanel {
         textPane.setEditable(false);
         textPane.setContentType("text/html;charset=utf-8");
         textPane.getDocument().putProperty(
-                Document.StreamDescriptionProperty, EthilVan.NEWS);
+                Document.StreamDescriptionProperty, Provider.get().newsUrl);
 
         textPane.addHyperlinkListener(new HyperlinkListener() {
             @Override

@@ -17,7 +17,7 @@ import fr.ethilvan.launcher.util.Util;
 
 public class Configuration {
 
-    private final Providers providers;
+    private final Modes modes;
     private String username;
     private String password;
     private boolean useLatestLwjgl;
@@ -53,7 +53,7 @@ public class Configuration {
 
     private Configuration() {
         this.useLatestLwjgl = false;
-        this.providers = new Providers();
+        this.modes = new Modes();
     }
 
     public void save() {
@@ -70,12 +70,12 @@ public class Configuration {
         }
     }
 
-    public Provider getProvider() {
-        return providers.getSelectedItem();
+    public Mode getMode() {
+        return modes.getSelectedItem();
     }
 
-    public Providers getProviders() {
-        return providers;
+    public Modes getModes() {
+        return modes;
     }
 
     public String getUsername() {

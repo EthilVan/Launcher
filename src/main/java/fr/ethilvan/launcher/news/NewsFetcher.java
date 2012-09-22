@@ -25,8 +25,8 @@ import org.apache.commons.io.IOUtils;
 import com.google.gson.JsonIOException;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.Provider;
 import fr.ethilvan.launcher.ui.NewsPanel;
-import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.Util;
 
 public class NewsFetcher {
@@ -38,7 +38,8 @@ public class NewsFetcher {
         extends NewsDownloader<ByteArrayOutputStream> {
 
         public NewsPageDownloader(JProgressBar progressBar) {
-            super(EthilVan.NEWS, new ByteArrayOutputStream(), progressBar);
+            super(Provider.get().newsUrl, new ByteArrayOutputStream(),
+                    progressBar);
         }
 
         @Override
@@ -158,7 +159,7 @@ public class NewsFetcher {
         Set<String> banners = new HashSet<String>();
         BufferedReader reader = null;
         try {
-            URL url = Util.urlFor(EthilVan.NEWS_BANNERS);
+            URL url = Util.urlFor(Provider.get().imgListUrl);
             InputStream stream = url.openStream();
             reader = new BufferedReader(new InputStreamReader(stream));
 

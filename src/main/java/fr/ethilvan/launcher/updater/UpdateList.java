@@ -33,7 +33,7 @@ public class UpdateList extends HttpExchange {
 
     public void fetch() {
         output = new ByteArrayOutputStream();
-        setURL(Launcher.get().getConfig().getProvider().getListUrl());
+        setURL(Launcher.get().getConfig().getMode().getListUrl());
 
         dialog.setStatus(STATUS, null);
         Launcher.get().download(this);

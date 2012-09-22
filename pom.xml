@@ -6,8 +6,8 @@
 	<artifactId>launcher</artifactId>
 	<version>dev-SNAPSHOT</version>
 
-	<name>EVLauncher</name>
-	<description>Ethilvan Custom Launcher</description>
+	<name>Launcher</name>
+	<description>Ethil Van Custom Launcher</description>
 	<url>https://github.com/EthilVanMods/Launcher</url>
 
 	<licenses>
@@ -53,22 +53,14 @@
 
 	<build>
 
-		<finalName>EthilVan</finalName>
 		<defaultGoal>clean install</defaultGoal>
 		<resources>
 			<resource>
-				<directory>src/main/resources/img</directory>
-				<targetPath>img</targetPath>
-				<includes>
-					<include>*</include>
-				</includes>
-			</resource>
-			<resource>
 				<directory>src/main/resources</directory>
-				<targetPath>.</targetPath>
 				<includes>
 					<include>*</include>
 				</includes>
+				<targetPath>.</targetPath>
 			</resource>
 		</resources>
 
@@ -91,7 +83,6 @@
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifest>
-							<addClasspath>true</addClasspath>
 							<addDefaultImplementationEntries>
 								true
 							</addDefaultImplementationEntries>
@@ -142,6 +133,28 @@
 			<properties>
 				<BUILD_NUMBER>Custom</BUILD_NUMBER>
 			</properties>
+		</profile>
+		<profile>
+			<id>ethilvan</id>
+			<build>
+				<finalName>EthilVan</finalName>
+				<resources>
+					<resource>
+						<directory>src/main/resources/ethilvan</directory>
+						<includes>
+							<include>config.json</include>
+						</includes>
+						<targetPath>.</targetPath>
+					</resource>
+					<resource>
+						<directory>src/main/resources/ethilvan/img</directory>
+						<includes>
+							<include>*</include>
+						</includes>
+						<targetPath>img</targetPath>
+					</resource>
+				</resources>
+			</build>
 		</profile>
 	</profiles>
 

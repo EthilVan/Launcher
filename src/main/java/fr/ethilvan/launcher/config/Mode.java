@@ -1,6 +1,6 @@
 package fr.ethilvan.launcher.config;
 
-public class Provider {
+public class Mode {
 
     private final String name;
     private final String directory;
@@ -8,7 +8,7 @@ public class Provider {
     private final String listUrl;
     private final String server;
 
-    public Provider(String name, String directory, String versionPath,
+    public Mode(String name, String directory, String versionPath,
             String listPath, String server) {
         this.name = name;
         this.directory = directory;

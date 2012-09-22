@@ -51,11 +51,11 @@ public class LoginForm extends JPanel {
         usernameC.gridx = 1;
         usernameC.gridy = 0;
 
-        GridBagConstraints providersC = new GridBagConstraints();
-        providersC.fill = GridBagConstraints.HORIZONTAL;
-        providersC.insets = buttonInsets;
-        providersC.gridx = 2;
-        providersC.gridy = 0;
+        GridBagConstraints modesC = new GridBagConstraints();
+        modesC.fill = GridBagConstraints.HORIZONTAL;
+        modesC.insets = buttonInsets;
+        modesC.gridx = 2;
+        modesC.gridy = 0;
 
         GridBagConstraints optionsBtnC = new GridBagConstraints();
         optionsBtnC.insets = buttonInsets;
@@ -117,8 +117,8 @@ public class LoginForm extends JPanel {
         rememberMe.setForeground(Color.WHITE);
         rememberMe.setBorder(null);
 
-        JComboBox providers = new JComboBox(config.getProviders());
-        providers.setOpaque(false);
+        JComboBox modes = new JComboBox(config.getModes());
+        modes.setOpaque(false);
         JButton optionsBtn = new JButton("Options");
         optionsBtn.setOpaque(false);
         JButton login = new JButton("Connexion");
@@ -163,7 +163,7 @@ public class LoginForm extends JPanel {
         add(usernameLabel, usernameLabelC);
         add(username, usernameC);
         add(optionsBtn, optionsBtnC);
-        add(providers, providersC);
+        add(modes, modesC);
         add(passwordLabel, passwordLabelC);
         add(password, passwordC);
         add(login, loginC);

@@ -38,7 +38,6 @@ import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.ui.LauncherFrame;
 import fr.ethilvan.launcher.updater.UpdateChecker;
 import fr.ethilvan.launcher.updater.Updater;
-import fr.ethilvan.launcher.util.EthilVan;
 import fr.ethilvan.launcher.util.OS;
 import fr.ethilvan.launcher.util.Util;
 
@@ -118,7 +117,7 @@ public class Launcher {
         System.setProperty("http.agent",
                 "EthilVanLauncher/" + VERSION
                 + " (" + OS.get().name() +
-                "; +" + EthilVan.WEBSITE + ")");
+                "; +" + Provider.get().website + ")");
 
         client = new HttpClient();
         try {
@@ -149,7 +148,7 @@ public class Launcher {
 
     public File getGameDirectory() {
         File file = new File(OS.get().getDataDir(),
-                config.getProvider().getDirectory());
+                config.getMode().getDirectory());
 
         if (!file.exists()) {
             if (!file.mkdirs()) {
@@ -222,7 +221,7 @@ public class Launcher {
             params.put("username", session.getUsername());
             params.put("sessionid", session.getSessionId());
             if (options.getQuickLaunch()) {
-                String server = config.getProvider().getServer();
+                String server = config.getMode().getServer();
                 String[] info = server.split(":");
                 params.put("server", info[0]);
                 params.put("port", info.length > 1 ? info[1] : "25565");

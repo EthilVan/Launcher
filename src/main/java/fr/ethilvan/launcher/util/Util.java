@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import fr.ethilvan.launcher.Provider;
+
 public final class Util {
 
     public final static String UTF8 = "UTF-8";
@@ -46,7 +48,7 @@ public final class Util {
 
     public static void openEthilVanFR() {
         try {
-            openURI(new URI(EthilVan.WEBSITE));
+            openURI(new URI(Provider.get().website));
         } catch (URISyntaxException exc) {
             throw wrap(exc);
         }

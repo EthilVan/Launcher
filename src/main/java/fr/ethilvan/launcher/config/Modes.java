@@ -4,19 +4,19 @@ import javax.swing.ComboBoxModel;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataListener;
 
-import fr.ethilvan.launcher.util.EthilVan;
+import fr.ethilvan.launcher.Provider;
 
-public class Providers implements ComboBoxModel {
+public class Modes implements ComboBoxModel {
 
     private int current;
-    private Provider[] providers;
+    private Mode[] providers;
 
     private final transient EventListenerList listeners =
             new EventListenerList();
 
-    public Providers() {
+    public Modes() {
         this.current = 0;
-        this.providers = new Provider[] { EthilVan.getProvider() };
+        this.providers = Provider.get().modes.clone();
     }
 
     @Override
@@ -25,7 +25,7 @@ public class Providers implements ComboBoxModel {
     }
 
     @Override
-    public Provider getElementAt(int index) {
+    public Mode getElementAt(int index) {
         return providers[index];
     }
 
@@ -41,7 +41,7 @@ public class Providers implements ComboBoxModel {
 
     @Override
     public void setSelectedItem(Object item) {
-        if (!(item instanceof Provider)) {
+        if (!(item instanceof Mode)) {
             throw new IllegalArgumentException(
                     "Item is not a Provider (" + item.getClass() + ")");
         }
@@ -57,7 +57,7 @@ public class Providers implements ComboBoxModel {
     }
 
     @Override
-    public Provider getSelectedItem() {
+    public Mode getSelectedItem() {
         return providers[current];
     }
 }
