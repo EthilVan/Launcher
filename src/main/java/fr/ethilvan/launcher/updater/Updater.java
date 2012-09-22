@@ -55,7 +55,7 @@ public class Updater {
         downloadsCount = downloadsInfo.length;
         Set<String> tags = new HashSet<String>();
         tags.add(OS.get().name().toLowerCase());
-        tags.add(Launcher.get().getOptions().getUseLatestLWJGL() ?
+        tags.add(Launcher.get().getConfig().getUseLatestLWJGL() ?
                 "lwjgl" : "lwjglold");
         for (DownloadInfo downloadInfo : downloadsInfo) {
             if (!downloadInfo.isValid(tags)) {

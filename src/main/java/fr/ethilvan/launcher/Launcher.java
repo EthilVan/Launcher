@@ -3,9 +3,6 @@ package fr.ethilvan.launcher;
 import java.applet.Applet;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -22,15 +19,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpExchange;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import com.sk89q.mclauncher.LoginSession;
 import com.sk89q.mclauncher.LoginSession.LoginException;
 import com.sk89q.mclauncher.LoginSession.OutdatedLauncherException;
@@ -39,6 +33,7 @@ import com.sk89q.mclauncher.launch.GameFrame;
 import com.sk89q.mclauncher.security.X509KeyStore;
 
 import fr.ethilvan.launcher.config.Options;
+import fr.ethilvan.launcher.config.Configuration;
 import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.ui.LauncherFrame;
 import fr.ethilvan.launcher.updater.UpdateChecker;
@@ -50,8 +45,6 @@ import fr.ethilvan.launcher.util.Util;
 public class Launcher {
 
     public static final String VERSION;
-
-    private static LauncherFrame frame;
 
     static {
         Package ppackage = Launcher.class.getPackage();
@@ -80,6 +73,7 @@ public class Launcher {
     }
 
     private static Launcher instance;
+    private static LauncherFrame frame;
 
     public static Launcher get() {
         return instance;
@@ -99,10 +93,26 @@ public class Launcher {
         return keyStore;
     }
 
+    public static File getSettingsDir() {
+        File dir = new File(OS.get().getDataDir(), ".evlauncher");
+        try {
+            FileUtils.forceMkdir(dir);
+        } catch (IOException exc) {
+            throw Util.wrap(exc);
+        }
+
+        return dir;
+    }
+
+    public static Gson getGson() {
+        return new GsonBuilder().setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+                .create();
+    }
+
     private final HttpClient client;
     private final Options options;
-
-    private boolean forceUpdate;
+    private final Configuration config;
 
     public Launcher() {
         System.setProperty("http.agent",
@@ -117,60 +127,16 @@ public class Launcher {
             throw Util.wrap(exc);
         }
 
-        File optionsFile = optionsFile();
-        if (optionsFile.exists()) {
-            FileReader reader = null;
-            try {
-                reader = new FileReader(optionsFile);
-                this.options = getGson().fromJson(reader,
-                        Options.class);
-            } catch (JsonSyntaxException exc) {
-                throw Util.wrap(exc);
-            } catch (JsonIOException exc) {
-                throw Util.wrap(exc);
-            } catch (FileNotFoundException exc) {
-                throw Util.wrap(exc);
-            } finally {
-                IOUtils.closeQuietly(reader);
-            }
-        } else {
-            this.options = new Options();
-        }
-
-        forceUpdate = false;
-    }
-
-    public Gson getGson() {
-        return new GsonBuilder().setPrettyPrinting()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
-                .create();
-    }
-
-    public File getSettingsDir() {
-        File dir = new File(OS.get().getDataDir(), ".evlauncher");
-        try {
-            FileUtils.forceMkdir(dir);
-        } catch (IOException exc) {
-            throw Util.wrap(exc);
-        }
-
-        return dir;
-    }
-
-    private File optionsFile() {
-        return new File(getSettingsDir(), "config.json");
+        options = new Options();
+        config = Configuration.load();
     }
 
     public Options getOptions() {
         return options;
     }
 
-    public boolean getForceUpdate() {
-        return forceUpdate;
-    }
-
-    public void setForceUpdate(boolean forceUpdate) {
-        this.forceUpdate = forceUpdate;
+    public Configuration getConfig() {
+        return config;
     }
 
     public void download(HttpExchange exchange) {
@@ -183,7 +149,7 @@ public class Launcher {
 
     public File getGameDirectory() {
         File file = new File(OS.get().getDataDir(),
-                options.getProvider().getDirectory());
+                config.getProvider().getDirectory());
 
         if (!file.exists()) {
             if (!file.mkdirs()) {
@@ -198,22 +164,7 @@ public class Launcher {
         return file;
     }
 
-    public void saveOptions() {
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(optionsFile());
-            getGson().toJson(options, writer);
-        } catch (JsonIOException exc) {
-            throw Util.wrap(exc);
-        } catch (IOException exc) {
-            throw Util.wrap(exc);
-        } finally {
-            IOUtils.closeQuietly(writer);
-        }
-    }
-
-    public void login(TaskDialog dialog, String name, char[] password,
-            boolean rememberMe, boolean quick) {
+    public void login(TaskDialog dialog, String name, char[] password) {
         dialog.setStatus("Authentification ...", null);
         LoginSession session = new LoginSession(name);
         String passwordStr = new String(password);
@@ -223,11 +174,12 @@ public class Launcher {
 
         try {
             if (session.login(passwordStr)) {
-                if (rememberMe) {
-                    options.rememberAccount(name, passwordStr);
+                if (options.getRememberMe()) {
+                    config.rememberAccount(name, passwordStr);
                 }
-                saveOptions();
-                update(dialog, session, quick);
+                config.save();
+
+                update(dialog, session);
             } else {
                 dialog.setLoginFailed();
             }
@@ -240,21 +192,19 @@ public class Launcher {
         }
     }
 
-    public void update(TaskDialog dialog, LoginSession session,
-            boolean quick) {
+    public void update(TaskDialog dialog, LoginSession session) {
         final UpdateChecker checker = new UpdateChecker();
-        if (!forceUpdate && !checker.needUpdate(dialog)) {
-            launch(dialog, session, quick);
+        if (!options.getForceUpdate() && !checker.needUpdate(dialog)) {
+            launch(dialog, session);
             return;
         }
 
         Updater updater = new Updater(checker, dialog);
         updater.perform();
-        launch(dialog, session, quick);
+        launch(dialog, session);
     }
 
-    public void launch(TaskDialog dialog, LoginSession session,
-            boolean quick) {
+    public void launch(TaskDialog dialog, LoginSession session) {
         File dir = getGameDirectory();
         ClassLoader classLoader = setupClassLoader(dir);
 
@@ -271,8 +221,8 @@ public class Launcher {
             params.put("stand-alone", "true");
             params.put("username", session.getUsername());
             params.put("sessionid", session.getSessionId());
-            if (quick) {
-                String server = options.getProvider().getServer();
+            if (options.getQuickLaunch()) {
+                String server = config.getProvider().getServer();
                 String[] info = server.split(":");
                 params.put("server", info[0]);
                 params.put("port", info.length > 1 ? info[1] : "25565");

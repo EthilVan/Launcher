@@ -24,6 +24,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Options;
 import fr.ethilvan.launcher.util.Util;
 
 public class OptionsDialog extends JDialog {
@@ -63,6 +65,9 @@ public class OptionsDialog extends JDialog {
 
         GeneralPanel() {
             super();
+            Options options = Launcher.get().getOptions();
+            Configuration config = Launcher.get().getConfig();
+
             Insets insets = new Insets(0, 0, 6, 0);
 
             JLabel forceUpdateLabel = new JLabel("Forcer la mise à jour :");
@@ -75,7 +80,7 @@ public class OptionsDialog extends JDialog {
 
             JCheckBox forceUpdate = new JCheckBox();
             forceUpdate.setOpaque(false);
-            forceUpdate.setSelected(Launcher.get().getForceUpdate());
+            forceUpdate.setSelected(options.getForceUpdate());
             GridBagConstraints forceUpdateC = new GridBagConstraints();
             forceUpdateC.insets = insets;
             forceUpdateC.anchor = GridBagConstraints.LINE_END;
@@ -95,8 +100,7 @@ public class OptionsDialog extends JDialog {
             JToggleButton latestLWJGL = new JCheckBox();
             latestLWJGL.setOpaque(false);
             latestLWJGL.setHorizontalTextPosition(SwingConstants.LEFT);
-            latestLWJGL.setSelected(Launcher.get().getOptions()
-                    .getUseLatestLWJGL());
+            latestLWJGL.setSelected(config.getUseLatestLWJGL());
             GridBagConstraints latestLWJGLC = new GridBagConstraints();
             latestLWJGLC.insets = insets;
             latestLWJGLC.anchor = GridBagConstraints.LINE_END;
@@ -154,7 +158,7 @@ public class OptionsDialog extends JDialog {
             forceUpdate.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent event) {
-                    Launcher.get().setForceUpdate(
+                    Launcher.get().getOptions().setForceUpdate(
                             event.getStateChange() == ItemEvent.SELECTED);
                 }
             });
@@ -162,7 +166,7 @@ public class OptionsDialog extends JDialog {
             latestLWJGL.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent event) {
-                    Launcher.get().getOptions().setUseLatestLWJGL(
+                    Launcher.get().getConfig().setUseLatestLWJGL(
                             event.getStateChange() == ItemEvent.SELECTED);
                 }
             });

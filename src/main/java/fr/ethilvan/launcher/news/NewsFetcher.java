@@ -81,9 +81,8 @@ public class NewsFetcher {
     private String newsPage;
 
     public NewsFetcher() {
-        Launcher launcher = Launcher.get();
-        cacheDir = new File(launcher.getSettingsDir(), CACHE_DIRNAME);
-        jsonFile = new File(launcher.getSettingsDir(), CACHE_FILENAME);
+        cacheDir = new File(Launcher.getSettingsDir(), CACHE_DIRNAME);
+        jsonFile = new File(Launcher.getSettingsDir(), CACHE_FILENAME);
 
         downloadsCount = 0;
         newsPage = null;
@@ -136,10 +135,9 @@ public class NewsFetcher {
 
     private CachedImage[] loadSavedCache() {
         CachedImage[] cache;
-        Launcher launcher = Launcher.get();
 
         try {
-            cache = launcher.getGson().fromJson(
+            cache = Launcher.getGson().fromJson(
                     new FileReader(jsonFile), CachedImage[].class);
         } catch (Exception exc) {
             FileUtils.deleteQuietly(cacheDir);
@@ -180,7 +178,7 @@ public class NewsFetcher {
         FileWriter writer = null;
         try {
             writer = new FileWriter(jsonFile);
-            Launcher.get().getGson().toJson(newCache, writer);
+            Launcher.getGson().toJson(newCache, writer);
         } catch (JsonIOException exc) {
             throw Util.wrap(exc);
         } catch (IOException exc) {

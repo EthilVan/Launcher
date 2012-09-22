@@ -1,45 +1,38 @@
 package fr.ethilvan.launcher.config;
 
-import fr.ethilvan.launcher.util.Encryption;
-
 public class Options {
 
-    private final Providers providers;
-    private String username;
-    private String password;
-    private boolean useLatestLwjgl;
+    private boolean forceUpdate;
+    private boolean rememberMe;
+    private boolean quickLaunch;
 
     public Options() {
-        this.useLatestLwjgl = false;
-        this.providers = new Providers();
+        forceUpdate = false;
+        rememberMe = false;
+        quickLaunch = false;
     }
 
-    public Provider getProvider() {
-        return providers.getSelectedItem();
+    public boolean getForceUpdate() {
+        return forceUpdate;
     }
 
-    public Providers getProviders() {
-        return providers;
+    public void setForceUpdate(boolean forceUpdate) {
+        this.forceUpdate = forceUpdate;
     }
 
-    public String getUsername() {
-        return username;
+    public boolean getRememberMe() {
+        return rememberMe;
     }
 
-    public String getPassword() {
-        return Encryption.decrypt(password);
+    public void setRememberMe(boolean rememberMe) {
+        this.rememberMe = rememberMe;
     }
 
-    public void rememberAccount(String username, String password) {
-        this.username = username;
-        this.password = Encryption.encrypt(password);
+    public boolean getQuickLaunch() {
+        return quickLaunch;
     }
 
-    public boolean getUseLatestLWJGL() {
-        return useLatestLwjgl;
-    }
-
-    public void setUseLatestLWJGL(boolean useLatestLWJGL) {
-        this.useLatestLwjgl = useLatestLWJGL;
+    public void setQuickLaunch(boolean quickLaunch) {
+        this.quickLaunch = quickLaunch;
     }
 }

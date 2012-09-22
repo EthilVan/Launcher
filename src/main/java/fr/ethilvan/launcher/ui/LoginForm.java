@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -20,7 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.config.Options;
+import fr.ethilvan.launcher.config.Configuration;
 
 public class LoginForm extends JPanel {
 
@@ -103,11 +105,11 @@ public class LoginForm extends JPanel {
         usernameLabel.setLabelFor(username);
         passwordLabel.setLabelFor(password);
 
-        Options options = Launcher.get().getOptions();
-        String rememberedUsername = options.getUsername();
+        Configuration config = Launcher.get().getConfig();
+        String rememberedUsername = config.getUsername();
         if (rememberedUsername != null) {
             username.setText(rememberedUsername);
-            password.setText(options.getPassword());
+            password.setText(config.getPassword());
         }
 
         final JCheckBox rememberMe = new JCheckBox("Retenir le mot de passe");
@@ -115,7 +117,7 @@ public class LoginForm extends JPanel {
         rememberMe.setForeground(Color.WHITE);
         rememberMe.setBorder(null);
 
-        JComboBox providers = new JComboBox(options.getProviders());
+        JComboBox providers = new JComboBox(config.getProviders());
         providers.setOpaque(false);
         JButton optionsBtn = new JButton("Options");
         optionsBtn.setOpaque(false);
@@ -123,6 +125,13 @@ public class LoginForm extends JPanel {
         login.setOpaque(false);
         JButton quickLogin = new JButton("Connexion Rapide");
         quickLogin.setOpaque(false);
+
+        rememberMe.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent event) {
+                Launcher.get().getOptions().setRememberMe(
+                        event.getStateChange() == ItemEvent.SELECTED);
+            }
+        });
 
         optionsBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -135,12 +144,13 @@ public class LoginForm extends JPanel {
                 final TaskDialog dialog =
                         new TaskDialog(getRootPane());
                 dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+                Launcher.get().getOptions().setQuickLaunch(
+                        event.getActionCommand().contains("Rapide"));
                 new Thread(new Runnable() {
                     public void run() {
                         Launcher.get().login(dialog, username.getText(),
-                                password.getPassword(),
-                                rememberMe.isSelected(),
-                                event.getActionCommand().contains("Rapide"));
+                                password.getPassword());
                     }
                 }).start();
                 dialog.setVisible(true);
