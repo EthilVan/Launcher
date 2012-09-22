@@ -60,4 +60,8 @@ public class Modes implements ComboBoxModel {
     public Mode getSelectedItem() {
         return providers[current];
     }
+
+    public int getSelectedIndex() {
+        return current;
+    }
 }

@@ -18,13 +18,16 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Modes;
 import fr.ethilvan.launcher.config.Options;
 import fr.ethilvan.launcher.util.Util;
 
@@ -41,7 +44,7 @@ public class OptionsDialog extends JDialog {
 
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.addTab("Générales", new GeneralPanel());
-        tabbed.addTab("Modes", new ProvidersPanel());
+        tabbed.addTab("Modes", new ModesPanel());
         add(tabbed);
 
         pack();
@@ -53,6 +56,7 @@ public class OptionsDialog extends JDialog {
         private static final long serialVersionUID = -1344334160948547435L;
 
         TabPanel() {
+            System.out.println(getBackground());
             setBackground(Color.WHITE);
             setLayout(new GridBagLayout());
             setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
@@ -187,12 +191,43 @@ public class OptionsDialog extends JDialog {
         }
     }
 
-    class ProvidersPanel extends TabPanel {
+    class ModesPanel extends TabPanel {
 
         private static final long serialVersionUID = -4138796647771985393L;
 
-        ProvidersPanel() {
+        ModesPanel() {
             super();
+
+            setLayout(new GridBagLayout());
+
+            Modes modes = Launcher.get().getConfig().getModes();
+            JList modesList = new JList(modes);
+            modesList.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            modesList.setBackground(new Color(250, 250, 250));
+            modesList.setSelectedIndex(modes.getSelectedIndex());
+            GridBagConstraints modesListC = new GridBagConstraints();
+            modesListC.insets = new Insets(0, 0, 3, 0);
+            modesListC.fill = GridBagConstraints.BOTH;
+            modesListC.weightx = 1.0;
+            modesListC.weighty = 1.0;
+            modesListC.gridy = 0;
+            add(modesList, modesListC);
+
+            JTextField addUrl = new JTextField();
+            addUrl.setBackground(new Color(250, 250, 250));
+            GridBagConstraints addUrlC = new GridBagConstraints();
+            addUrlC.insets = new Insets(0, 0, 3, 0);
+            addUrlC.fill = GridBagConstraints.HORIZONTAL;
+            addUrlC.weightx = 1.0;
+            addUrlC.gridy = 1;
+            add(addUrl, addUrlC);
+
+            JButton addBtn = new JButton("Ajouter");
+            GridBagConstraints addBtnC = new GridBagConstraints();
+            addBtnC.anchor = GridBagConstraints.LINE_END;
+            addBtnC.weightx = 1.0;
+            addBtnC.gridy = 2;
+            add(addBtn, addBtnC);
         }
     }
 }
