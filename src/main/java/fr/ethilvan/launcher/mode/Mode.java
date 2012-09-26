@@ -1,4 +1,4 @@
-package fr.ethilvan.launcher.config;
+package fr.ethilvan.launcher.mode;
 
 public class Mode {
 

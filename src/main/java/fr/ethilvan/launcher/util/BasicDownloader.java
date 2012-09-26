@@ -33,12 +33,14 @@ public class BasicDownloader<T extends OutputStream>
     protected void onResponseStatus(Buffer http, int code, Buffer reasonBuf) {
         if (code != 200) {
             onError(code, reasonBuf.toString(Util.UTF8));
+            cancel();
         }
     }
 
     @Override
     protected void onResponseHeader(Buffer name, Buffer value) {
-        if (name.toString().equals("Content-Length")) {
+        if (getStatus() != HttpExchange.STATUS_CANCELLED
+                && name.toString().equals("Content-Length")) {
             int length = Integer.parseInt(value.toString());
             onLengthKnown(length);
         }

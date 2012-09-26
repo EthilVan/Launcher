@@ -138,12 +138,8 @@ public class Launcher {
         return config;
     }
 
-    public void download(HttpExchange exchange) {
-        try {
-            client.send(exchange);
-        } catch (IOException exc) {
-            throw Util.wrap(exc);
-        }
+    public void download(HttpExchange exchange) throws IOException {
+        client.send(exchange);
     }
 
     public File getGameDirectory() {
@@ -180,7 +176,7 @@ public class Launcher {
 
                 update(dialog, session);
             } else {
-                dialog.setLoginFailed();
+                dialog.setError("Nom d'utilisateur ou mot de passe invalide");
             }
         } catch (IOException exc) {
             throw Util.wrap(exc);

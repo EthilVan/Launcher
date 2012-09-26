@@ -12,6 +12,8 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.mode.Mode;
+import fr.ethilvan.launcher.mode.Modes;
 import fr.ethilvan.launcher.util.Encryption;
 import fr.ethilvan.launcher.util.Util;
 

@@ -94,7 +94,11 @@ public class NewsFetcher {
         NewsPageDownloader newsDownloader = new NewsPageDownloader(progressBar);
 
         downloadsCount++;
-        Launcher.get().download(newsDownloader);
+        try {
+            Launcher.get().download(newsDownloader);
+        } catch (IOException exc) {
+            return;
+        }
 
         while (downloadsCount > 0) {
             try {
@@ -121,8 +125,11 @@ public class NewsFetcher {
             try {
                 ImageDownloader downloader =
                         new ImageDownloader(cached, progressBar);
+                try {
+                    Launcher.get().download(downloader);
+                } catch (IOException exc) {
+                }
                 downloadsCount++;
-                Launcher.get().download(downloader);
                 newCache.add(cached);
             } catch (FileNotFoundException exc) {
                 throw Util.wrap(exc);

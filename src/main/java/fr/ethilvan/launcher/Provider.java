@@ -8,7 +8,7 @@ import org.apache.commons.io.IOUtils;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import fr.ethilvan.launcher.config.Mode;
+import fr.ethilvan.launcher.mode.Mode;
 import fr.ethilvan.launcher.util.Util;
 
 public class Provider {

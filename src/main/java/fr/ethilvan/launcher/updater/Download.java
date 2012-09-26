@@ -42,7 +42,10 @@ public class Download extends HttpExchange {
 
         dialog.setStatus(title, null);
         setURL(info.getUrl());
-        Launcher.get().download(this);
+        try {
+            Launcher.get().download(this);
+        } catch (IOException exc) {
+        }
     }
 
     @Override

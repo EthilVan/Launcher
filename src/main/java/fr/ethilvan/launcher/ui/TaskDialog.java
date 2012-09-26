@@ -88,11 +88,11 @@ public class TaskDialog extends JDialog {
         });
     }
 
-    public void setLoginFailed() {
+    public void setError(final String message) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                label.setText("Nom d'utilisateur ou mot de passe invalide");
+                label.setText(message);
                 progressBar.setVisible(false);
                 close.setVisible(true);
             }

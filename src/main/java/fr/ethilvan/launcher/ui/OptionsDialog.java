@@ -12,6 +12,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,8 +29,9 @@ import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.config.Configuration;
-import fr.ethilvan.launcher.config.Modes;
 import fr.ethilvan.launcher.config.Options;
+import fr.ethilvan.launcher.mode.ModeDownloader;
+import fr.ethilvan.launcher.mode.Modes;
 import fr.ethilvan.launcher.util.Util;
 
 public class OptionsDialog extends JDialog {
@@ -56,7 +59,6 @@ public class OptionsDialog extends JDialog {
         private static final long serialVersionUID = -1344334160948547435L;
 
         TabPanel() {
-            System.out.println(getBackground());
             setBackground(Color.WHITE);
             setLayout(new GridBagLayout());
             setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
@@ -213,7 +215,7 @@ public class OptionsDialog extends JDialog {
             modesListC.gridy = 0;
             add(modesList, modesListC);
 
-            JTextField addUrl = new JTextField();
+            final JTextField addUrl = new JTextField();
             addUrl.setBackground(new Color(250, 250, 250));
             GridBagConstraints addUrlC = new GridBagConstraints();
             addUrlC.insets = new Insets(0, 0, 3, 0);
@@ -228,6 +230,27 @@ public class OptionsDialog extends JDialog {
             addBtnC.weightx = 1.0;
             addBtnC.gridy = 2;
             add(addBtn, addBtnC);
+
+            addBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    final TaskDialog dialog = new TaskDialog(ModesPanel.this);
+
+                    ByteArrayOutputStream output = new ByteArrayOutputStream();
+                    String url = addUrl.getText();
+                    try {
+                        ModeDownloader modeDownloader = 
+                                 new ModeDownloader(url, output, dialog);
+                         Launcher.get().download(modeDownloader);
+                    } catch (IllegalArgumentException exc) {
+                        dialog.setError("URL invalide !");
+                    } catch (IOException exc) {
+                        dialog.setError("Impossible d'établir la connexion.");
+                    }
+
+                    dialog.setVisible(true);
+                }
+            });
         }
     }
 }
