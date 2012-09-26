@@ -1,6 +1,7 @@
 package fr.ethilvan.launcher.ui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -20,17 +21,16 @@ public class TaskDialog extends JDialog {
 
     private static final long serialVersionUID = 3508184860311427900L;
 
-    private final Component frame;
     private final JLabel label;
     private final JProgressBar progressBar;
     private final JButton close;
 
     public TaskDialog(Component frame) {
         super();
-        this.frame = frame;
 
         setTitle("Downloads");
         setModal(true);
+        setMinimumSize(new Dimension(460, 120));
         setResizable(false);
 
         JPanel panel = new JPanel();
@@ -40,7 +40,7 @@ public class TaskDialog extends JDialog {
 
         label = new JLabel();
         GridBagConstraints labelC = new GridBagConstraints();
-        labelC.insets = new Insets(0, 0, 6, 0);
+        labelC.insets = new Insets(0, 0, 20, 0);
         labelC.gridx = 0;
         labelC.gridy = 0;
         panel.add(label, labelC);
@@ -50,18 +50,24 @@ public class TaskDialog extends JDialog {
         GridBagConstraints progressC = new GridBagConstraints();
         progressC.gridx = 0;
         progressC.gridy = 1;
+        progressC.weightx = 1.0;
         progressC.fill = GridBagConstraints.HORIZONTAL;
         panel.add(progressBar, progressC);
 
         close = new JButton("Fermer");
         close.setVisible(false);
+        GridBagConstraints closeC = new GridBagConstraints();
+        closeC.gridx = 0;
+        closeC.gridy = 1;
+        closeC.anchor = GridBagConstraints.CENTER;
+        panel.add(close, closeC);
+
         close.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TaskDialog.this.dispose();
             }
         });
-        panel.add(close, progressC);
 
         pack();
         setLocationRelativeTo(frame);
@@ -78,9 +84,6 @@ public class TaskDialog extends JDialog {
                     progressBar.setIndeterminate(false);
                     progressBar.setModel(model);
                 }
-
-                pack();
-                setLocationRelativeTo(frame);
             }
         });
     }
@@ -92,9 +95,6 @@ public class TaskDialog extends JDialog {
                 label.setText("Nom d'utilisateur ou mot de passe invalide");
                 progressBar.setVisible(false);
                 close.setVisible(true);
-
-                pack();
-                setLocationRelativeTo(frame);
             }
         });
     }
