@@ -47,6 +47,7 @@ public class TaskDialog extends JDialog {
 
         progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
+        progressBar.setStringPainted(true);
         GridBagConstraints progressC = new GridBagConstraints();
         progressC.gridx = 0;
         progressC.gridy = 1;

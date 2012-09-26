@@ -1,15 +1,15 @@
 {
-    "website": "http://ethilvan.fr",
-    "news-url": "http://ethilvan.fr/news/launcher",
-    "img-list-url": "http://ethilvan.fr/news/banners",
+	"website": "http://ethilvan.fr",
+	"news-url": "http://ethilvan.fr/news/launcher",
+	"img-list-url": "http://ethilvan.fr/news/banners",
 
-    "modes": [
-	{
-            "name": "Ethil Van",
-	    "directory": ".ethilvan2",
-	    "version-url": "http://ethilvan.fr/launcher/version",
-	    "list-url": "http://ethilvan.fr/launcher/list.json",
-	    "server": "play.ethilvan.fr"
-	}
-    ]
+	"modes": [
+		{
+			"name": "Ethil Van",
+			"directory": ".ethilvan2",
+			"version-url": "http://ethilvan.fr/launcher/version",
+			"list-url": "http://ethilvan.fr/launcher/list.json",
+			"server": "play.ethilvan.fr"
+		}
+	]
 }

@@ -3,7 +3,7 @@ EthilVan Launcher
 
 Description
 -----------
-This is the source code of the custom launcher of the french minecraft server
+This is the source code of the custom launcher for the french minecraft server
 [Ethil Van](http://ethilvan.fr).
 
 It is mostly written from scratch but also include some code from

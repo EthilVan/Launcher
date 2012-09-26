@@ -50,6 +50,7 @@ public class OptionsDialog extends JDialog {
         tabbed.addTab("Modes", new ModesPanel());
         add(tabbed);
 
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
         setLocationRelativeTo(frame);
     }
@@ -59,7 +60,6 @@ public class OptionsDialog extends JDialog {
         private static final long serialVersionUID = -1344334160948547435L;
 
         TabPanel() {
-            setBackground(Color.WHITE);
             setLayout(new GridBagLayout());
             setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         }
@@ -205,8 +205,8 @@ public class OptionsDialog extends JDialog {
             Modes modes = Launcher.get().getConfig().getModes();
             JList modesList = new JList(modes);
             modesList.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-            modesList.setBackground(new Color(250, 250, 250));
             modesList.setSelectedIndex(modes.getSelectedIndex());
+
             GridBagConstraints modesListC = new GridBagConstraints();
             modesListC.insets = new Insets(0, 0, 3, 0);
             modesListC.fill = GridBagConstraints.BOTH;
@@ -216,7 +216,6 @@ public class OptionsDialog extends JDialog {
             add(modesList, modesListC);
 
             final JTextField addUrl = new JTextField();
-            addUrl.setBackground(new Color(250, 250, 250));
             GridBagConstraints addUrlC = new GridBagConstraints();
             addUrlC.insets = new Insets(0, 0, 3, 0);
             addUrlC.fill = GridBagConstraints.HORIZONTAL;

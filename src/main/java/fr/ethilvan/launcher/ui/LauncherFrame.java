@@ -17,13 +17,15 @@ public class LauncherFrame extends JFrame {
 
     public LauncherFrame() {
         super();
+        Launcher.get().setFrame(this);
+
         build();
         pack();
     }
 
     private void build() {
         setTitle("Ethil Van Launcher");
-        setMinimumSize(new Dimension(874, 520));
+        setMinimumSize(new Dimension(920, 540));
         setLocationRelativeTo(null);
 
         try {

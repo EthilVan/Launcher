@@ -65,14 +65,13 @@ public class Launcher {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                frame = new LauncherFrame();
+                LauncherFrame frame = new LauncherFrame();
                 frame.setVisible(true);
             }
         });
     }
 
     private static Launcher instance;
-    private static LauncherFrame frame;
 
     public static Launcher get() {
         return instance;
@@ -104,7 +103,8 @@ public class Launcher {
     }
 
     public static Gson getGson() {
-        return new GsonBuilder().setPrettyPrinting()
+        return new GsonBuilder()
+        .setPrettyPrinting()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
                 .create();
     }
@@ -112,6 +112,8 @@ public class Launcher {
     private final HttpClient client;
     private final Options options;
     private final Configuration config;
+
+    private LauncherFrame frame;
 
     public Launcher() {
         System.setProperty("http.agent",
@@ -136,6 +138,14 @@ public class Launcher {
 
     public Configuration getConfig() {
         return config;
+    }
+
+    public void setFrame(LauncherFrame frame) {
+        if (this.frame != null) {
+            throw new UnsupportedOperationException();
+        }
+
+        this.frame = frame;
     }
 
     public void download(HttpExchange exchange) throws IOException {
@@ -224,7 +234,7 @@ public class Launcher {
             }
 
             dialog.dispose();
-            Launcher.frame.dispose();
+            frame.dispose();
             try {
                 client.stop();
             } catch (Exception exc) {
