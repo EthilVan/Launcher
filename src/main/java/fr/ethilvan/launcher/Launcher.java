@@ -218,10 +218,11 @@ public class Launcher {
                     "net.minecraft.client.MinecraftApplet");
             Applet applet = (Applet) klass.newInstance();
 
-            GameFrame frame = new GameFrame(new Dimension(854, 480));
-            frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            frame.setTitle("Ethil Van");
-            frame.setVisible(true);
+            GameFrame gameFrame = new GameFrame(new Dimension(854, 480));
+            gameFrame.setDefaultCloseOperation(
+                    WindowConstants.DISPOSE_ON_CLOSE);
+            gameFrame.setTitle("Ethil Van");
+            gameFrame.setVisible(true);
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("stand-alone", "true");
             params.put("username", session.getUsername());
@@ -243,7 +244,7 @@ public class Launcher {
 
             GameAppletContainer container = new GameAppletContainer(params,
                     applet);
-            frame.start(container);
+            gameFrame.start(container);
         } catch (ClassNotFoundException exc) {
             throw Util.wrap(exc);
         } catch (InstantiationException exc) {

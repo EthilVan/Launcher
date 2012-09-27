@@ -94,13 +94,33 @@ public class OptionsDialog extends JDialog {
             forceUpdateC.gridy = 0;
             add(forceUpdate, forceUpdateC);
 
+            JLabel defaultConfigLabel =
+                    new JLabel("Utiliser la configuration recommandée :");
+            GridBagConstraints defaultConfigLabelC = new GridBagConstraints();
+            defaultConfigLabelC.insets = insets;
+            defaultConfigLabelC.anchor = GridBagConstraints.LINE_START;
+            defaultConfigLabelC.gridx = 0;
+            defaultConfigLabelC.gridy = 1;
+            add(defaultConfigLabel, defaultConfigLabelC);
+
+            JToggleButton defaultConfig = new JCheckBox();
+            defaultConfig.setOpaque(false);
+            defaultConfig.setHorizontalTextPosition(SwingConstants.LEFT);
+            defaultConfig.setSelected(config.getUseDefaultConfig());
+            GridBagConstraints defaultConfigC = new GridBagConstraints();
+            defaultConfigC.insets = insets;
+            defaultConfigC.anchor = GridBagConstraints.LINE_END;
+            defaultConfigC.gridx = 1;
+            defaultConfigC.gridy = 1;
+            add(defaultConfig, defaultConfigC);
+
             JLabel latestLWJGLLabel =
                     new JLabel("Utiliser la dernière version de LWJGL :");
             GridBagConstraints latestLWJGLLabelC = new GridBagConstraints();
             latestLWJGLLabelC.insets = insets;
             latestLWJGLLabelC.anchor = GridBagConstraints.LINE_START;
             latestLWJGLLabelC.gridx = 0;
-            latestLWJGLLabelC.gridy = 1;
+            latestLWJGLLabelC.gridy = 2;
             add(latestLWJGLLabel, latestLWJGLLabelC);
 
             JToggleButton latestLWJGL = new JCheckBox();
@@ -111,7 +131,7 @@ public class OptionsDialog extends JDialog {
             latestLWJGLC.insets = insets;
             latestLWJGLC.anchor = GridBagConstraints.LINE_END;
             latestLWJGLC.gridx = 1;
-            latestLWJGLC.gridy = 1;
+            latestLWJGLC.gridy = 2;
             add(latestLWJGL, latestLWJGLC);
 
             JLabel directoryLabel = new JLabel("Dossier du jeu : ",
@@ -121,7 +141,7 @@ public class OptionsDialog extends JDialog {
             directoryLabelC.ipady = 8;
             directoryLabelC.anchor = GridBagConstraints.LINE_START;
             directoryLabelC.gridx = 0;
-            directoryLabelC.gridy = 2;
+            directoryLabelC.gridy = 3;
             add(directoryLabel, directoryLabelC);
 
             final JLabel directory = new JLabel("<html><a href=\"\">"
@@ -132,7 +152,7 @@ public class OptionsDialog extends JDialog {
             directoryC.ipady = 8;
             directoryC.anchor = GridBagConstraints.LINE_END;
             directoryC.gridx = 1;
-            directoryC.gridy = 2;
+            directoryC.gridy = 3;
             add(directory, directoryC);
 
             JLabel versionLabel = new JLabel("Version du launcher : ");
@@ -141,7 +161,7 @@ public class OptionsDialog extends JDialog {
             versionLabelC.ipady = 8;
             versionLabelC.anchor = GridBagConstraints.LINE_START;
             versionLabelC.gridx = 0;
-            versionLabelC.gridy = 3;
+            versionLabelC.gridy = 4;
             add(versionLabel, versionLabelC);
 
             JLabel version = new JLabel(Launcher.VERSION);
@@ -150,7 +170,7 @@ public class OptionsDialog extends JDialog {
             versionC.ipady = 8;
             versionC.anchor = GridBagConstraints.LINE_END;
             versionC.gridx = 1;
-            versionC.gridy = 3;
+            versionC.gridy = 4;
             add(version, versionC);
 
             JButton done = new JButton("Terminer");
@@ -158,13 +178,21 @@ public class OptionsDialog extends JDialog {
             doneC.anchor = GridBagConstraints.LAST_LINE_END;
             doneC.insets = new Insets(6, 0, 0, 0);
             doneC.gridx = 1;
-            doneC.gridy = 4;
+            doneC.gridy = 5;
             add(done, doneC);
 
             forceUpdate.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent event) {
                     Launcher.get().getOptions().setForceUpdate(
+                            event.getStateChange() == ItemEvent.SELECTED);
+                }
+            });
+
+            defaultConfig.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent event) {
+                    Launcher.get().getConfig().setUseDefaultConfig(
                             event.getStateChange() == ItemEvent.SELECTED);
                 }
             });

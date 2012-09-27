@@ -22,6 +22,7 @@ public class Configuration {
     private final Modes modes;
     private String username;
     private String password;
+    private boolean useDefaultConfig;
     private boolean useLatestLwjgl;
 
     public static Configuration load() {
@@ -54,8 +55,9 @@ public class Configuration {
     }
 
     private Configuration() {
-        this.useLatestLwjgl = false;
         this.modes = new Modes();
+        this.useDefaultConfig = true;
+        this.useLatestLwjgl = false;
     }
 
     public void save() {
@@ -91,6 +93,14 @@ public class Configuration {
     public void rememberAccount(String username, String password) {
         this.username = username;
         this.password = Encryption.encrypt(password);
+    }
+
+    public boolean getUseDefaultConfig() {
+        return useDefaultConfig;
+    }
+
+    public void setUseDefaultConfig(boolean useDefaultConfig) {
+        this.useDefaultConfig = useDefaultConfig;
     }
 
     public boolean getUseLatestLWJGL() {

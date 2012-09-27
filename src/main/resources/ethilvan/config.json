@@ -7,8 +7,8 @@
 		{
 			"name": "Ethil Van",
 			"directory": ".ethilvan2",
-			"version-url": "http://ethilvan.fr/launcher/version",
-			"list-url": "http://ethilvan.fr/launcher/list.json",
+			"version-url": "http://updates.ethilvan.fr/ethilvan/version",
+			"list-url": "http://updates.ethilvan.fr/ethilvan/list.json",
 			"server": "play.ethilvan.fr"
 		}
 	]

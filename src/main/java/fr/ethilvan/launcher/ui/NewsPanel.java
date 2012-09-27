@@ -67,7 +67,6 @@ public class NewsPanel extends JPanel {
 
         progressBar.setPreferredSize(new Dimension(300, 18));
         progressBar.setIndeterminate(true);
-        progressBar.setStringPainted(true);
 
         JPanel progressPane = new JPanel();
         progressPane.setOpaque(false);
