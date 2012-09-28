@@ -6,6 +6,10 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -51,18 +55,25 @@ public class NewsPanel extends JPanel {
         this.textPane = new JTextPane();
         this.newsScroll = new JScrollPane(textPane);
 
-        build(progressBar);
+        URL url;
+        try {
+            url = new URL(Provider.get().newsUrl);
+            build(url, progressBar);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                NewsFetcher newsFetcher = new NewsFetcher();
-                newsFetcher.fetch(NewsPanel.this, progressBar);
-            }
-        }).start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NewsFetcher newsFetcher = new NewsFetcher();
+                    newsFetcher.fetch(NewsPanel.this, progressBar);
+                }
+            }).start();
+        } catch (MalformedURLException exc) {
+            Logger.getLogger(NewsPanel.class.getName())
+                    .log(Level.WARNING, "Can't load news", exc);
+        }
     }
 
-    private void build(JProgressBar progressBar) {
+    private void build(URL url, JProgressBar progressBar) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         progressBar.setPreferredSize(new Dimension(300, 18));
@@ -77,8 +88,8 @@ public class NewsPanel extends JPanel {
         textPane.setOpaque(false);
         textPane.setEditable(false);
         textPane.setContentType("text/html;charset=utf-8");
-        textPane.getDocument().putProperty(
-                Document.StreamDescriptionProperty, Provider.get().newsUrl);
+        textPane.getDocument().putProperty(Document.StreamDescriptionProperty,
+                url);
 
         textPane.addHyperlinkListener(new HyperlinkListener() {
             @Override

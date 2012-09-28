@@ -2,19 +2,19 @@ package fr.ethilvan.launcher.updater;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.TaskDialog;
-import fr.ethilvan.launcher.util.Util;
 
 public class UpdateChecker {
 
@@ -53,9 +53,10 @@ public class UpdateChecker {
 
             reader = new BufferedReader(new FileReader(versionFile));
             return reader.readLine();
-        } catch (FileNotFoundException exc) {
-            throw new RuntimeException(exc);
-        } catch (IOException e) {
+        } catch (IOException exc) {
+            Logger.getLogger(UpdateChecker.class.getName())
+                    .log(Level.WARNING,
+                            "Unable to read local version file", exc);
             return null;
         } finally {
             IOUtils.closeQuietly(reader);
@@ -65,12 +66,15 @@ public class UpdateChecker {
     private String getRemoteVersion() {
         BufferedReader reader = null;
         try {
-            URL url = Util.urlFor(Launcher.get().getConfig().getMode()
+            URL url = new URL(Launcher.get().getConfig().getMode()
                     .getVersionURL());
             InputStream stream = url.openStream();
             reader = new BufferedReader(new InputStreamReader(stream));
             return reader.readLine();
-        } catch (IOException _) {
+        } catch (IOException exc) {
+            Logger.getLogger(UpdateChecker.class.getName())
+                    .log(Level.WARNING,
+                            "Unable to download remote version file", exc);
             return null;
         } finally {
             IOUtils.closeQuietly(reader);
@@ -83,7 +87,10 @@ public class UpdateChecker {
             writer = new FileWriter(getLocalVersionFile());
             writer.write(getRemoteVersion());
             writer.close();
-        } catch (IOException _) {
+        } catch (IOException exc) {
+            Logger.getLogger(UpdateChecker.class.getName())
+                    .log(Level.SEVERE,
+                            "Unable to write new version file", exc);
         }
     }
 }

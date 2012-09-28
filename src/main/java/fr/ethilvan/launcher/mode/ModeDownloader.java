@@ -2,10 +2,13 @@ package fr.ethilvan.launcher.mode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultBoundedRangeModel;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.config.Configuration;
 import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.util.BasicDownloader;
 import fr.ethilvan.launcher.util.Util;
@@ -45,7 +48,8 @@ public class ModeDownloader extends BasicDownloader<ByteArrayOutputStream> {
             mode = Launcher.getGson()
                     .fromJson(json, Mode.class);
         } catch (UnsupportedEncodingException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(Configuration.class.getName())
+                    .log(Level.SEVERE, "Unable to read downloaded mode", exc);
         }
 
         try {

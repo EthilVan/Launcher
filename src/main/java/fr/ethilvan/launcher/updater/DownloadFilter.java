@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -13,7 +15,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import fr.ethilvan.launcher.ui.TaskDialog;
-import fr.ethilvan.launcher.util.Util;
 
 public enum DownloadFilter {
 
@@ -26,7 +27,9 @@ public enum DownloadFilter {
                 output = new FileOutputStream(targetPath);
                 IOUtils.copy(input, output);
             } catch (IOException exc) {
-                throw Util.wrap(exc);
+                Logger.getLogger(DownloadFilter.class.getName())
+                        .log(Level.SEVERE, "Unable to copy downloaded file",
+                                exc);
             } finally {
                 IOUtils.closeQuietly(output);
                 IOUtils.closeQuietly(input);
@@ -59,7 +62,9 @@ public enum DownloadFilter {
                     IOUtils.closeQuietly(output);
                 }
             } catch (IOException exc) {
-                throw Util.wrap(exc);
+                Logger.getLogger(DownloadFilter.class.getName())
+                        .log(Level.SEVERE,
+                                "Unable to uncompress downloaded file", exc);
             } finally {
                 IOUtils.closeQuietly(inputStream);
             }

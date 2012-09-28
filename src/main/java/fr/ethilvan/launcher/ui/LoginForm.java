@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -23,6 +25,7 @@ import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.util.Encryption.EncryptionException;
 
 public class LoginForm extends JPanel {
 
@@ -109,7 +112,12 @@ public class LoginForm extends JPanel {
         String rememberedUsername = config.getUsername();
         if (rememberedUsername != null) {
             username.setText(rememberedUsername);
-            password.setText(config.getPassword());
+            try {
+                password.setText(config.getPassword());
+            } catch (EncryptionException exc) {
+                Logger.getLogger(LoginForm.class.getName())
+                        .log(Level.WARNING, "Unable to decrypt password", exc);
+            }
         }
 
         final JCheckBox rememberMe = new JCheckBox("Retenir le mot de passe");

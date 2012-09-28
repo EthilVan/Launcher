@@ -2,7 +2,10 @@ package fr.ethilvan.launcher.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
@@ -52,19 +55,16 @@ public class BasicDownloader<T extends OutputStream>
         try {
             content.writeTo(output);
         } catch (IOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(BasicDownloader.class.getName())
+                    .log(Level.WARNING,
+                            "Cannot convert downloaded text to UTF-8", exc);
         }
         onProgress(progress);
     }
 
     @Override
     protected void onResponseComplete() {
-        try {
-            output.close();
-        } catch (IOException exc) {
-            throw Util.wrap(exc);
-        }
-
+        IOUtils.closeQuietly(output);
         onComplete(output);
     }
 }

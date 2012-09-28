@@ -38,14 +38,14 @@ public class Logo extends JPanel {
         img = tmpImg;
 
         if (img != null) {
-            setPreferredSize(
-                    new Dimension(img.getWidth(null) + 30, img.getHeight(null)));
+            setPreferredSize(new Dimension(img.getWidth(null) + 30,
+                    img.getHeight(null)));
         }
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event) {
-                Util.openEthilVanFR();
+                Util.openProviderWebsite();
             }
         });
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

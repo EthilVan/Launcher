@@ -18,47 +18,56 @@ import javax.crypto.spec.PBEParameterSpec;
 
 public final class Encryption {
 
-    public static String encrypt(String string) {
+    public static class EncryptionException extends Exception {
+
+        private static final long serialVersionUID = 503527060812817946L;
+
+        public EncryptionException(Throwable thr) {
+            super(thr);
+        }
+    }
+
+    public static String encrypt(String string) throws EncryptionException {
         Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
         try {
             byte[] encrypted = cipher.doFinal(string.getBytes(Util.UTF8));
             return Base64.encodeToString(encrypted, false);
         } catch (BadPaddingException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (IllegalBlockSizeException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (UnsupportedEncodingException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         }
     }
 
-    public static String decrypt(String encrypted) {
+    public static String decrypt(String encrypted) throws EncryptionException {
         Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
         try {
             byte[] decrypted = cipher.doFinal(Base64.decode(encrypted));
             return new String(decrypted, Util.UTF8);
         } catch (IllegalBlockSizeException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (BadPaddingException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (UnsupportedEncodingException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         }
     }
 
-    private static Cipher getCipher(int mode) {
+    private static Cipher getCipher(int mode) throws EncryptionException {
         try {
             return getUnsafeCipher(mode);
         } catch (InvalidKeySpecException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (NoSuchAlgorithmException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (NoSuchPaddingException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (InvalidKeyException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         } catch (InvalidAlgorithmParameterException exc) {
-            throw Util.wrap(exc);
+            throw new EncryptionException(exc);
         }
     }
 

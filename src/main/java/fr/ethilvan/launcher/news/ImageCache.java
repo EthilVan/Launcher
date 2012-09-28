@@ -8,10 +8,12 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import fr.ethilvan.launcher.util.Util;
+import fr.ethilvan.launcher.config.Configuration;
 
 public class ImageCache extends Dictionary<URL, Image> {
 
@@ -65,7 +67,9 @@ public class ImageCache extends Dictionary<URL, Image> {
                 try {
                     img = ImageIO.read(cached.getFile(cacheDir));
                 } catch (IOException exc) {
-                    throw Util.wrap(exc);
+                    Logger.getLogger(Configuration.class.getName())
+                            .log(Level.WARNING, "Unable to load cached image",
+                                    exc);
                 }
             }
 

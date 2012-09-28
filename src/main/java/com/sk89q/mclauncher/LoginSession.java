@@ -21,15 +21,22 @@ package com.sk89q.mclauncher;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+
+import com.sk89q.mclauncher.security.X509KeyStore;
 
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.util.Util;
@@ -41,8 +48,27 @@ import fr.ethilvan.launcher.util.Util;
  */
 public class LoginSession {
 
-    private static final String MINECRAFT_LOGIN_URL = "https://login.minecraft.net/";
+    private static final String MINECRAFT_LOGIN_URL =
+            "https://login.minecraft.net/";
     private static final String LAUNCHER_VERSION = "13";
+
+    public static X509KeyStore getMinecraftLoginCert() {
+        X509KeyStore keyStore = new X509KeyStore();
+        InputStream certStream = Launcher.class
+                .getResourceAsStream("/mclogin.cer");
+        try {
+            keyStore.addRootCertificates(certStream);
+        } catch (CertificateException exc) {
+            Logger.getLogger(LoginSession.class.getName())
+                    .log(Level.SEVERE, "Unable to read minecraft certificate",
+                            exc);
+        } catch (IOException exc) {
+            Logger.getLogger(LoginSession.class.getName())
+                    .log(Level.SEVERE, "Unable to read minecraft certificate",
+                            exc);
+        }
+        return keyStore;
+    }
 
     private String username;
     private boolean isValid;
@@ -66,7 +92,8 @@ public class LoginSession {
      * @throws OutdatedLauncherException thrown on an outdated launcher exception
      * @throws LoginException thrown on an unknown login exception
      */
-    public boolean login(String password) throws IOException, OutdatedLauncherException, LoginException {
+    public boolean login(String password) throws IOException,
+            OutdatedLauncherException, LoginException {
         HttpsURLConnection conn = null;
 
         String params = String.format("user=%s&password=%s&version=%s",
@@ -75,11 +102,11 @@ public class LoginSession {
                 URLEncoder.encode(LAUNCHER_VERSION, Util.UTF8));
 
         TrustManager[] trustManagers = new TrustManager[] {
-                Launcher.getMinecraftLoginCert()
+                getMinecraftLoginCert()
         };
 
         try {
-            URL loginURL = Util.urlFor(MINECRAFT_LOGIN_URL);
+            URL loginURL = new URL(MINECRAFT_LOGIN_URL);
             conn = (HttpsURLConnection) loginURL.openConnection();
             SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(null, trustManagers, null);
@@ -138,10 +165,15 @@ public class LoginSession {
                     throw new LoginException(result.trim());
                 }
             }
-        } catch (KeyManagementException e) {
-            throw new LoginException("Failed to process PKI keys: " + e.getMessage(), e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new LoginException("Failed to initiate TLS: " + e.getMessage(), e);
+        } catch (MalformedURLException exc) {
+            throw new LoginException("Can't parse minecraft.net URL: "
+                    + exc.getMessage(), exc);
+        } catch (KeyManagementException exc) {
+            throw new LoginException("Failed to process PKI keys: "
+                    + exc.getMessage(), exc);
+        } catch (NoSuchAlgorithmException exc) {
+            throw new LoginException("Failed to initiate TLS: "
+                    + exc.getMessage(), exc);
         } finally {
             if (conn != null) conn.disconnect();
             conn = null;

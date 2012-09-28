@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
@@ -15,7 +17,7 @@ import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.mode.Mode;
 import fr.ethilvan.launcher.mode.Modes;
 import fr.ethilvan.launcher.util.Encryption;
-import fr.ethilvan.launcher.util.Util;
+import fr.ethilvan.launcher.util.Encryption.EncryptionException;
 
 public class Configuration {
 
@@ -27,7 +29,7 @@ public class Configuration {
 
     public static Configuration load() {
         File optionsFile = configFile();
-        Configuration options;
+        Configuration options = null;
         if (optionsFile.exists()) {
             FileReader reader = null;
             try {
@@ -35,15 +37,20 @@ public class Configuration {
                 options = Launcher.getGson().fromJson(reader,
                         Configuration.class);
             } catch (JsonSyntaxException exc) {
-                throw Util.wrap(exc);
+                Logger.getLogger(Configuration.class.getName())
+                        .log(Level.SEVERE, "Unable to read user config", exc);
             } catch (JsonIOException exc) {
-                throw Util.wrap(exc);
+                Logger.getLogger(Configuration.class.getName())
+                        .log(Level.SEVERE, "Unable to read user config", exc);
             } catch (FileNotFoundException exc) {
-                throw Util.wrap(exc);
+                Logger.getLogger(Configuration.class.getName())
+                        .log(Level.SEVERE, "Unable to read user config", exc);
             } finally {
                 IOUtils.closeQuietly(reader);
             }
-        } else {
+        }
+
+        if (options == null) {
             options = new Configuration();
         }
 
@@ -66,9 +73,11 @@ public class Configuration {
             writer = new FileWriter(configFile());
             Launcher.getGson().toJson(this, writer);
         } catch (JsonIOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(Configuration.class.getName())
+                    .log(Level.SEVERE, "Unable to write user config", exc);
         } catch (IOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(Configuration.class.getName())
+                    .log(Level.SEVERE, "Unable to write user config", exc);
         } finally {
             IOUtils.closeQuietly(writer);
         }
@@ -86,11 +95,12 @@ public class Configuration {
         return username;
     }
 
-    public String getPassword() {
+    public String getPassword() throws EncryptionException {
         return Encryption.decrypt(password);
     }
 
-    public void rememberAccount(String username, String password) {
+    public void rememberAccount(String username, String password)
+            throws EncryptionException{
         this.username = username;
         this.password = Encryption.encrypt(password);
     }

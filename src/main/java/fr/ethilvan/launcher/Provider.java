@@ -2,6 +2,8 @@ package fr.ethilvan.launcher;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
@@ -9,7 +11,6 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 import fr.ethilvan.launcher.mode.Mode;
-import fr.ethilvan.launcher.util.Util;
 
 public class Provider {
 
@@ -33,12 +34,17 @@ public class Provider {
             return Launcher.getGson().fromJson(reader,
                     Provider.class);
         } catch (JsonSyntaxException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(Provider.class.getName())
+                    .log(Level.SEVERE, "Unable to read bundled config", exc);
         } catch (JsonIOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(Provider.class.getName())
+                    .log(Level.SEVERE, "Unable to read bundled config", exc);
         } finally {
             IOUtils.closeQuietly(reader);
         }
+
+        System.exit(200);
+        return null;
     }
 
     public final String website;

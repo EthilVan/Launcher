@@ -11,11 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JProgressBar;
 
@@ -49,15 +52,21 @@ public class NewsFetcher {
                    + "Impossible d'afficher les news. ("
                    + code + ": " + reason
                    + ")</center></b></html>";
+            downloadsCount--;
         }
 
         public void onComplete(ByteArrayOutputStream output) {
-            downloadsCount--;
             try {
                 newsPage = output.toString(Util.UTF8);
             } catch (UnsupportedEncodingException exc) {
-                throw Util.wrap(exc);
+                Logger.getLogger(NewsFetcher.class.getName())
+                        .log(Level.WARNING, "Unable to convert news to UTF-8",
+                                exc);
+                newsPage = "<html><b><center>"
+                        + "Impossible d'afficher les news."
+                        + ")</center></b></html>";
             }
+            downloadsCount--;
         }
     }
 
@@ -67,6 +76,11 @@ public class NewsFetcher {
                 throws FileNotFoundException {
             super(img.getUrl(), new FileOutputStream(img.getFile(cacheDir)),
                     progressBar);
+        }
+
+        @Override
+        protected void onError(int code, String reason) {
+            downloadsCount--;
         }
 
         @Override
@@ -125,14 +139,12 @@ public class NewsFetcher {
             try {
                 ImageDownloader downloader =
                         new ImageDownloader(cached, progressBar);
-                try {
-                    Launcher.get().download(downloader);
-                } catch (IOException exc) {
-                }
+                Launcher.get().download(downloader);
                 downloadsCount++;
                 newCache.add(cached);
-            } catch (FileNotFoundException exc) {
-                throw Util.wrap(exc);
+            } catch (IOException exc) {
+                Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.WARNING, "Unable to download image", exc);
             }
         }
 
@@ -156,7 +168,9 @@ public class NewsFetcher {
         try {
             FileUtils.forceMkdir(cacheDir);
         } catch (IOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.WARNING, "Unable to create cache directory",
+                            exc);
         }
 
         return cache;
@@ -166,7 +180,7 @@ public class NewsFetcher {
         Set<String> banners = new HashSet<String>();
         BufferedReader reader = null;
         try {
-            URL url = Util.urlFor(Provider.get().imgListUrl);
+            URL url = new URL(Provider.get().imgListUrl);
             InputStream stream = url.openStream();
             reader = new BufferedReader(new InputStreamReader(stream));
 
@@ -174,7 +188,13 @@ public class NewsFetcher {
             while ((line = reader.readLine()) != null) {
                 banners.add(line);
             }
+        } catch (MalformedURLException exc) {
+            Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.WARNING, "Invalid image list url", exc);
         } catch (IOException exc) {
+            Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.WARNING, "Can't download image images list at "
+                            + Provider.get().imgListUrl, exc);
         } finally {
             IOUtils.closeQuietly(reader);
         }
@@ -188,9 +208,13 @@ public class NewsFetcher {
             writer = new FileWriter(jsonFile);
             Launcher.getGson().toJson(newCache, writer);
         } catch (JsonIOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.WARNING, "Can't write images cache index",
+                            exc);
         } catch (IOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.WARNING, "Can't write images cache index",
+                            exc);
         } finally {
             IOUtils.closeQuietly(writer);
         }

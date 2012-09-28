@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 
@@ -13,7 +15,6 @@ import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.config.Configuration;
 import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.util.OS;
-import fr.ethilvan.launcher.util.Util;
 
 public class Updater {
 
@@ -39,7 +40,9 @@ public class Updater {
         try {
             FileUtils.forceMkdir(tmpDir);
         } catch (IOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(Updater.class.getName())
+                    .log(Level.SEVERE, "Unable to create temporary directory"
+                            + "to store downloaded files", exc);
         }
 
         UpdateList updateList = new UpdateList(dialog);
@@ -95,7 +98,9 @@ public class Updater {
             InputStream input = new FileInputStream(tmpFile);
             info.getFilter().filter(dialog, input, targetPath);
         } catch (IOException exc) {
-            throw Util.wrap(exc);
+            Logger.getLogger(Updater.class.getName())
+                    .log(Level.SEVERE, "Unable to read downloaded file",
+                            exc);
         }
 
         if (--downloadsCount == 0) {
