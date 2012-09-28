@@ -1,0 +1,15 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <dontWrapJar>false</dontWrapJar>
+  <jar>target/EthilVan.jar</jar>
+  <outfile>target/EthilVan.exe</outfile>
+  <errTitle>EthilVan: Erreur Impossible de trouver Java</errTitle>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <customProcName>false</customProcName>
+  <stayAlive>false</stayAlive>
+  <icon>src/main/resources/ethilvan/favicon.ico</icon>
+  <jre>
+	 <minVersion>1.6.0</minVersion>
+	 <jdkPreference>preferJdk</jdkPreference>
+  </jre>
+</launch4jConfig>
