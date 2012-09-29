@@ -1,30 +1,31 @@
 package fr.ethilvan.launcher.ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.Document;
+import javax.swing.ScrollPaneConstants;
 
-import fr.ethilvan.launcher.Launcher;
+import org.xhtmlrenderer.extend.ReplacedElementFactory;
+import org.xhtmlrenderer.simple.FSScrollPane;
+import org.xhtmlrenderer.simple.XHTMLPanel;
+import org.xhtmlrenderer.simple.xhtml.XhtmlNamespaceHandler;
+import org.xhtmlrenderer.swing.BasicPanel;
+import org.xhtmlrenderer.swing.FSMouseListener;
+import org.xhtmlrenderer.swing.LinkListener;
+import org.xhtmlrenderer.util.XRRuntimeException;
+
 import fr.ethilvan.launcher.Provider;
 import fr.ethilvan.launcher.news.ImageCache;
+import fr.ethilvan.launcher.news.ImageCacheReplacedElementFactory;
 import fr.ethilvan.launcher.news.NewsFetcher;
 import fr.ethilvan.launcher.util.Util;
 
@@ -32,28 +33,17 @@ public class NewsPanel extends JPanel {
 
     private static final long serialVersionUID = 5869234355558740443L;
 
-    private final Image bg;
-    private final JTextPane textPane;
-    private final JScrollPane newsScroll;
+    private final XHTMLPanel xhtmlPane;
+    private final FSScrollPane newsScroll;
 
     public NewsPanel() {
         super();
         setOpaque(true);
-        Image tmpBg = null;
-        try {
-            InputStream is = Launcher.class
-                    .getResourceAsStream("/img/bg-news.jpg");
-            if (is != null) {
-                tmpBg = ImageIO.read(is);
-                is.close();
-            }
-        } catch (IOException _) {
-        }
-        this.bg = tmpBg;
+        setBackground(Color.decode("#141414"));
 
         final JProgressBar progressBar = new JProgressBar();
-        this.textPane = new JTextPane();
-        this.newsScroll = new JScrollPane(textPane);
+        this.xhtmlPane = new XHTMLPanel();
+        this.newsScroll = new FSScrollPane(xhtmlPane);
 
         URL url;
         try {
@@ -85,31 +75,24 @@ public class NewsPanel extends JPanel {
         progressPane.add(progressBar);
         add(progressPane);
 
-        textPane.setOpaque(false);
-        textPane.setEditable(false);
-        textPane.setContentType("text/html;charset=utf-8");
-        textPane.getDocument().putProperty(Document.StreamDescriptionProperty,
-                url);
-
-        textPane.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent event) {
-                if (event.getEventType()
-                        != HyperlinkEvent.EventType.ACTIVATED) {
-                    return;
-                }
-
-                if (event.getURL() == null) {
-                    return;
-                }
-
-                try {
-                    Util.openURL(event.getURL());
-                } catch (RuntimeException _) {
-                }
+        xhtmlPane.setOpaque(false);
+        xhtmlPane.setBorder(BorderFactory.createEmptyBorder());
+        xhtmlPane.getSharedContext().getTextRenderer()
+            .setSmoothingThreshold(0);
+        for (Object listener : xhtmlPane.getMouseTrackingListeners()) {
+            if (listener instanceof LinkListener) {
+                xhtmlPane.removeMouseTrackingListener(
+                        (FSMouseListener) listener);
+            }
+        }
+        xhtmlPane.addMouseTrackingListener(new LinkListener() {
+            public void linkClicked(BasicPanel panel, String uri) {
+                Util.openURL(uri);
             }
         });
 
+        newsScroll.setHorizontalScrollBarPolicy(
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         newsScroll.setBorder(BorderFactory.createEmptyBorder());
         newsScroll.getViewport().setOpaque(false);
         newsScroll.setOpaque(false);
@@ -117,27 +100,45 @@ public class NewsPanel extends JPanel {
         add(newsScroll);
     }
 
-    public void displayNews(ImageCache cacheMap, String news,
+    public void displayNews(ImageCache cache, String news,
             JProgressBar progressBar) {
-        textPane.getDocument().putProperty("imageCache", cacheMap);
-        textPane.setText(news.toString());
-        textPane.setCaretPosition(0);
+        ReplacedElementFactory delegate =
+                xhtmlPane.getSharedContext().getReplacedElementFactory();
+        ReplacedElementFactory factory =
+                new ImageCacheReplacedElementFactory(cache, delegate);
+        xhtmlPane.getSharedContext().setReplacedElementFactory(factory);
+        try {
+            xhtmlPane.setDocumentFromString(news, Provider.get().newsUrl,
+                new XhtmlNamespaceHandler());
+            ensureNewsVisible(progressBar);
+        } catch (XRRuntimeException exc) {
+            displayError(progressBar);
+        }
+    }
 
+    public void displayError(JProgressBar progressBar) {
+        xhtmlPane.setDocumentFromString(errorPage(), Provider.get().newsUrl,
+                new XhtmlNamespaceHandler());
+        ensureNewsVisible(progressBar);
+    }
+
+    private void ensureNewsVisible(JProgressBar progressBar) {
         newsScroll.setVisible(true);
         progressBar.getParent().setVisible(false);
     }
 
-    @Override
-    public void paintComponent(Graphics g) {
-        int width = getWidth();
-        int height = getHeight();
-        int imgWidth = bg.getWidth(null);
-        int imgHeight = bg.getHeight(null);
-
-        for (int x = 0; x < width; x += imgWidth) {
-            for (int y = 0; y < height; y += imgHeight) {
-                g.drawImage(bg, x, y, this);
-            }
-        }
+    private String errorPage() {
+        return
+          "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+              + " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+          + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+          + "  <head>\n"
+          + "    <meta http-equiv=\"content-type\""
+              + " content=\"text/html; charset=UTF-8\" />\n"
+          + "  </head>\n"
+          + "  <body style=\"color: #666;\">\n"
+          + "    <h3><center>Impossible d'afficher les news.</center></h3>\n"
+          + "  </body>\n"
+          + "</html>";
     }
 }

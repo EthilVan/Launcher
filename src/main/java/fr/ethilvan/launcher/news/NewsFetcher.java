@@ -48,10 +48,6 @@ public class NewsFetcher {
         @Override
         protected void onError(int code, String reason) {
             cancel();
-            newsPage = "<html><b><center>"
-                   + "Impossible d'afficher les news. ("
-                   + code + ": " + reason
-                   + ")</center></b></html>";
             downloadsCount--;
         }
 
@@ -121,7 +117,11 @@ public class NewsFetcher {
             }
         }
 
-        newsPanel.displayNews(cache, newsPage, progressBar);
+        if (newsPage != null) {
+            newsPanel.displayNews(cache, newsPage, progressBar);
+        } else {
+            newsPanel.displayError(progressBar);
+        }
     }
 
     private ImageCache getCache(JProgressBar progressBar) {

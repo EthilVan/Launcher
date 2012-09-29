@@ -28,7 +28,7 @@ public class LoginPanel extends JPanel {
         Image tmpBg = null;
         try {
             InputStream is = Launcher.class
-                    .getResourceAsStream("/img/leaves.png");
+                    .getResourceAsStream("/img/login-bg.png");
             if (is != null) {
                 tmpBg = ImageIO.read(is);
                 is.close();
