@@ -8,70 +8,65 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.eclipse.jetty.client.HttpExchange;
-import org.eclipse.jetty.io.Buffer;
 
-import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.TaskDialog;
+import fr.ethilvan.launcher.util.Download;
 
-public class PackageDownload extends HttpExchange {
+public class PackageDownload extends Download<OutputStream> {
 
-    private final TaskDialog dialog;
-    protected final Package info;
-    private final String title;
-    private final BoundedRangeModel progress;
-
-    private OutputStream output;
-
-    public PackageDownload(TaskDialog dialog, Package info) {
-        super();
-        this.dialog = dialog;
-        this.info = info;
-        this.title = "Téléchargement de " + info.getName() + " ...";
-        this.progress = new DefaultBoundedRangeModel();
-    }
-
-    public void start(File tmpDir) {
+    public static PackageDownload create(Updater updater, TaskDialog dialog,
+            File tmpDir, Package ppackage) {
         try {
-            File tmpFile = info.getTemp(tmpDir);
-            output = FileUtils.openOutputStream(tmpFile);
+            File tmpFile = ppackage.getTemp(tmpDir);
+            OutputStream output = FileUtils.openOutputStream(tmpFile);
+            return new PackageDownload(updater, dialog, ppackage, output);
         } catch (IOException exc) {
             exc.printStackTrace();
         }
+
+        return null;
+    }
+
+    private final Updater updater;
+    private final TaskDialog dialog;
+    private final Package ppackage;
+    private final String title;
+    private final BoundedRangeModel range;
+
+    private PackageDownload(Updater updater, TaskDialog dialog,
+            Package ppackage, OutputStream output) {
+        super(ppackage.url, output);
+        this.updater = updater;
+        this.dialog = dialog;
+        this.ppackage = ppackage;
+        this.title = "Téléchargement de " + ppackage.name + " ...";
+        this.range = new DefaultBoundedRangeModel();
 
         dialog.setStatus(title, null);
-        setURL(info.getUrl());
-        try {
-            Launcher.get().download(this);
-        } catch (IOException exc) {
-        }
     }
 
     @Override
-    protected void onResponseHeader(Buffer name, Buffer value) {
-        if (name.toString().equals("Content-Length")) {
-            int length = Integer.parseInt(value.toString());
-            progress.setMinimum(0);
-            progress.setMaximum(length);
-            progress.setValue(0);
-            dialog.setStatus(title, progress);
-        }
+    protected void onError(Error error) {
+        updater.decrementDownloads();
     }
 
     @Override
-    protected void onResponseContent(Buffer content) {
-        progress.setValue(progress.getValue() + content.length());
-        dialog.setStatus(title, progress);
-        try {
-            content.writeTo(output);
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        }
+    protected void onLengthKnown(int length) {
+        range.setMinimum(0);
+        range.setMaximum(length);
+        range.setValue(0);
+        dialog.setStatus(title, range);
     }
 
     @Override
-    protected void onResponseComplete() {
-        IOUtils.closeQuietly(output);
+    protected void onProgress(int progress) {
+        range.setValue(range.getValue() + progress);
+    }
+
+    @Override
+    protected void onComplete(OutputStream output) {
+        super.onComplete(output);
+        updater.decrementDownloads();
+        updater.onDownloadComplete(ppackage);
     }
 }

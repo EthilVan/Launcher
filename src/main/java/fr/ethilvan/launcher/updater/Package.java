@@ -5,15 +5,15 @@ import java.util.Set;
 
 public class Package {
 
-    private final String name;
-    private final String path;
-    private final String url;
-    private final String[] tags;
+    public final String name;
+    public final String path;
+    public final String url;
+    private final String[][] tags;
     private final PackageFilter filter;
 
     private transient File tmpFile = null;
 
-    public Package(String name, String path, String url, String[] tags,
+    public Package(String name, String path, String url, String[][]tags,
             PackageFilter filter) {
         this.name = name;
         this.path = path;
@@ -22,30 +22,22 @@ public class Package {
         this.filter = filter;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public boolean isValid(Set<String> validTags) {
+    // [["a", "b"], ["c", "d"]] means (a and b) or (c and d)
+    public boolean isNeeded(Set<String> validTags) {
         if (tags == null) {
             return true;
         }
 
-        for (String tag : tags) {
-            if (!validTags.contains(tag)) {
-                return false;
+        boolean match = false;
+        for (String[] tagGroup : tags) {
+            boolean matchGroup = true;
+            for (String tag : tagGroup) {
+                matchGroup &= validTags.contains(tag);
             }
+            match |= matchGroup;
         }
 
-        return true;
+        return match;
     }
 
     public File getTemp(File tmpDir) {

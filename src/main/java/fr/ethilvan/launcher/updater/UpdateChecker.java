@@ -39,6 +39,10 @@ public class UpdateChecker {
         return false;
     }
 
+    public boolean isFirstUpdate() {
+        return getLocalVersionFile().exists();
+    }
+
     private File getLocalVersionFile() {
         return new File(Launcher.get().getGameDirectory(), LOCAL_VERSION_FILE);
     }

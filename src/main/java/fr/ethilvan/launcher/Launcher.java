@@ -258,8 +258,11 @@ public class Launcher {
 
         Logger.getLogger(Launcher.class.getName()).info("Updating");
         Updater updater = new Updater(checker, dialog);
-        updater.perform();
-        launch(dialog, session);
+        if (updater.perform()) {
+            launch(dialog, session);
+        } else {
+            dialog.setError("La mise à jour n'a pas pu être effectué.");
+        }
     }
 
     public void launch(TaskDialog dialog, LoginSession session) {

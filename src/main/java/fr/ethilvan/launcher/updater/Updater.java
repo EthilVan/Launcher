@@ -2,6 +2,7 @@ package fr.ethilvan.launcher.updater;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ public class Updater {
 
     private final TaskDialog dialog;
     private final UpdateChecker updateChecker;
+    private final Set<String> tags;
 
     private File tmpDir;
     private int downloadsCount;
@@ -28,9 +30,20 @@ public class Updater {
     public Updater(UpdateChecker checker, TaskDialog dialog) {
         this.updateChecker = checker;
         this.dialog = dialog;
+        this.tags = new HashSet<String>();
+
+        tags.add(OS.get().name().toLowerCase());
+        if (checker.isFirstUpdate()) {
+            tags.add("first");
+        }
+        Config config = Launcher.get().getConfig();
+        if (config.getUseDefaultConfig()) {
+            tags.add("config");
+        }
+        tags.add(config.getUseLatestLWJGL() ? "lwjgl" : "lwjglold");
     }
 
-    public void perform() {
+    public boolean perform() {
         dialog.setStatus("Mise à jour", null);
 
         tmpDir = new File(Launcher.get().getGameDirectory(), ".tmp");
@@ -45,41 +58,76 @@ public class Updater {
                             + "to store downloaded files", exc);
         }
 
-        PackageList updateList = new PackageList(dialog);
-        updateList.fetch();
-        try {
-            updateList.waitForDone();
-        } catch (InterruptedException _) {
+        Update packageList = getPackageList();
+        if (packageList == null) {
+            return false;
         }
 
-        downloadAll(updateList.getDownloads());
+        removeAll(packageList.toRemoves);
+        downloadAll(packageList.packages);
+        return true;
     }
 
-    private void downloadAll(Package[] downloadsInfo) {
-        downloadsCount = downloadsInfo.length;
-
-        Set<String> tags = new HashSet<String>();
-        tags.add(OS.get().name().toLowerCase());
-        Config config = Launcher.get().getConfig();
-        if (config.getUseDefaultConfig()) {
-            tags.add("config");
+    private Update getPackageList() {
+        UpdateDownload updateList = new UpdateDownload(dialog);
+        try {
+            Launcher.get().download(updateList);
+        } catch (IOException exc) {
+            Logger.getLogger(Updater.class.getName())
+                    .log(Level.SEVERE, "Cannot fetch download list", exc);
+            return null;
         }
-        tags.add(config.getUseLatestLWJGL() ? "lwjgl" : "lwjglold");
 
-        for (Package downloadInfo : downloadsInfo) {
-            if (!downloadInfo.isValid(tags)) {
-                downloadsCount--;
+        try {
+            updateList.waitForDone();
+            return updateList.getPackageList();
+        } catch (InterruptedException exc) {
+            Logger.getLogger(Updater.class.getName())
+                    .log(Level.SEVERE, "Cannot fetch download list", exc);
+            return null;
+        }
+    }
+
+    public synchronized void decrementDownloads() {
+        downloadsCount--;
+    }
+
+    private void removeAll(String[] toRemoves) {
+        File dir = Launcher.get().getGameDirectory();
+        for (String toRemove : toRemoves) {
+            File file = new File(dir, toRemove);
+            Logger.getLogger(Updater.class.getName())
+                    .info("Removing " + toRemove);
+            try {
+                FileUtils.forceDelete(file);
+            } catch (FileNotFoundException exc) {
+            } catch (IOException exc) {
+                Logger.getLogger(Updater.class.getName())
+                        .log(Level.SEVERE, "Unable to remove " + toRemove);
+            }
+        }
+    }
+
+    private void downloadAll(Package[] ppackages) {
+        downloadsCount = ppackages.length;
+
+        for (Package ppackage : ppackages) {
+            if (!ppackage.isNeeded(tags)) {
+                decrementDownloads();
                 continue;
             }
 
-            PackageDownload download = new PackageDownload(dialog, downloadInfo) {
-                @Override
-                protected void onResponseComplete() {
-                    super.onResponseComplete();
-                    onDownloadComplete(info);
-                }
-            };
-            download.start(tmpDir);
+            PackageDownload download = PackageDownload.create(this, dialog,
+                    tmpDir, ppackage);
+            try {
+                Logger.getLogger(Updater.class.getName())
+                        .info("Downloading " + ppackage.name);
+                Launcher.get().download(download);
+            } catch (IOException exc) {
+                Logger.getLogger(Updater.class.getName()).log(Level.SEVERE,
+                        "Cannot download " + ppackage.name, exc);
+                decrementDownloads();
+            }
         }
 
         while (!done) {
@@ -90,17 +138,16 @@ public class Updater {
         }
     }
 
-    private void onDownloadComplete(Package info) {
+    public void onDownloadComplete(Package ppackage) {
         try {
-            File tmpFile = info.getTemp(tmpDir);
+            File tmpFile = ppackage.getTemp(tmpDir);
             File targetPath = new File(Launcher.get().getGameDirectory(),
-                    info.getPath());
+                    ppackage.path);
             InputStream input = new FileInputStream(tmpFile);
-            info.getFilter().filter(dialog, input, targetPath);
+            ppackage.getFilter().filter(dialog, input, targetPath);
         } catch (IOException exc) {
             Logger.getLogger(Updater.class.getName())
-                    .log(Level.SEVERE, "Unable to read downloaded file",
-                            exc);
+                    .log(Level.SEVERE, "Unable to read downloaded file", exc);
         }
 
         if (--downloadsCount == 0) {

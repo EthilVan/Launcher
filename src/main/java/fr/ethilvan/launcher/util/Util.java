@@ -15,6 +15,10 @@ public final class Util {
 
     public final static String UTF8 = "UTF-8";
 
+    public static File getHomeDirectory() {
+        return new File(System.getProperty("user.home", "."));
+    }
+
     public static void openURI(URI url) {
         try {
             Desktop.getDesktop().browse(url);
@@ -45,14 +49,6 @@ public final class Util {
     public static void openProviderWebsite() {
         openURL(Provider.get().website);
     }
-
-    public static File getHomeDirectory() {
-        return new File(System.getProperty("user.home", "."));
-    }
-
-    /*public static RuntimeException wrap(Throwable throwable) {
-        return new RuntimeException(throwable);
-    }*/
 
     private Util() {
     }
