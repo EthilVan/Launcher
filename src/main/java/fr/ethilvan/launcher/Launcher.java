@@ -159,8 +159,8 @@ public class Launcher {
             client = null;
         }
 
-        options = new Options();
         config = Config.load();
+        options = new Options(config.isAccountRemembered());
     }
 
     public Options getOptions() {
@@ -227,6 +227,8 @@ public class Launcher {
                                         "Unable to store account informations",
                                         exc);
                     }
+                } else {
+                    config.forgetAccount();
                 }
                 config.save();
 

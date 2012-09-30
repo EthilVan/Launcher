@@ -6,10 +6,10 @@ public class Options {
     private boolean rememberMe;
     private boolean quickLaunch;
 
-    public Options() {
-        forceUpdate = false;
-        rememberMe = false;
-        quickLaunch = false;
+    public Options(boolean rememberMe) {
+        this.forceUpdate = false;
+        this.rememberMe = rememberMe;
+        this.quickLaunch = false;
     }
 
     public boolean getForceUpdate() {

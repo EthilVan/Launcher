@@ -92,6 +92,10 @@ public class Config {
         return modes;
     }
 
+    public boolean isAccountRemembered() {
+        return username != null;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -104,6 +108,11 @@ public class Config {
             throws EncryptionException{
         this.username = username;
         this.password = Encryption.encrypt(password);
+    }
+
+    public void forgetAccount() {
+        this.username = null;
+        this.password = null;
     }
 
     public boolean getUseDefaultConfig() {

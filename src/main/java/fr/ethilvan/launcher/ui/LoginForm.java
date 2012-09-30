@@ -103,27 +103,28 @@ public class LoginForm extends JPanel {
                 SwingConstants.RIGHT);
         final JTextField username = new JTextField(16);
         final JPasswordField password = new JPasswordField(16);
+        final JCheckBox rememberMe = new JCheckBox("Retenir le mot de passe");
         usernameLabel.setForeground(Color.WHITE);
         passwordLabel.setForeground(Color.WHITE);
+        rememberMe.setForeground(Color.WHITE);
         usernameLabel.setLabelFor(username);
         passwordLabel.setLabelFor(password);
+        rememberMe.setOpaque(false);
+        rememberMe.setBorder(null);
 
         Config config = Launcher.get().getConfig();
-        String rememberedUsername = config.getUsername();
-        if (rememberedUsername != null) {
-            username.setText(rememberedUsername);
+        if (config.isAccountRemembered()) {
+            username.setText(config.getUsername());
             try {
                 password.setText(config.getPassword());
             } catch (EncryptionException exc) {
                 Logger.getLogger(LoginForm.class.getName())
                         .log(Level.WARNING, "Unable to decrypt password", exc);
             }
+            rememberMe.setSelected(true);
+        } else {
+            rememberMe.setSelected(false);
         }
-
-        final JCheckBox rememberMe = new JCheckBox("Retenir le mot de passe");
-        rememberMe.setOpaque(false);
-        rememberMe.setForeground(Color.WHITE);
-        rememberMe.setBorder(null);
 
         JComboBox modes = new JComboBox(config.getModes());
         modes.setOpaque(false);
