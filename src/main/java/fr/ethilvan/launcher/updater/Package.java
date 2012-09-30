@@ -13,7 +13,7 @@ public class Package {
 
     private transient File tmpFile = null;
 
-    public Package(String name, String path, String url, String[][]tags,
+    public Package(String name, String path, String url, String[][] tags,
             PackageFilter filter) {
         this.name = name;
         this.path = path;

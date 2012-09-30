@@ -3,6 +3,8 @@ package fr.ethilvan.launcher.updater;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
@@ -48,6 +50,14 @@ public class PackageDownload extends Download<OutputStream> {
     @Override
     protected void onError(Error error) {
         updater.decrementDownloads();
+        if (error instanceof ExceptionError) {
+            Logger.getLogger(PackageDownload.class.getName())
+                    .log(Level.SEVERE, "Unable to download " + ppackage.name,
+                            ((ExceptionError) error).getCause());
+        } else {
+            Logger.getLogger(PackageDownload.class.getName())
+                    .log(Level.SEVERE, "Unable to download " + ppackage.name);
+        }
     }
 
     @Override

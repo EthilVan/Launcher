@@ -38,7 +38,14 @@ public class UpdateDownload extends Download<ByteArrayOutputStream> {
 
     @Override
     public void onError(Error error) {
-        
+        if (error instanceof ExceptionError) {
+            Logger.getLogger(UpdateDownload.class.getName())
+                    .log(Level.SEVERE, "Unable to download update",
+                            ((ExceptionError) error).getCause());
+        } else {
+            Logger.getLogger(UpdateDownload.class.getName())
+                    .log(Level.SEVERE, "Unable to download update");
+        }
     }
 
     @Override
