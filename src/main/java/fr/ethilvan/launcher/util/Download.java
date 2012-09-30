@@ -9,19 +9,49 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
-public class BasicDownloader<T extends OutputStream>
+public abstract class Download<T extends OutputStream>
         extends HttpExchange {
+
+    public static class Error {
+
+        private String message;
+
+        public Error(String message) {
+            this.message = message;
+        }
+
+        public Error(int code, String reason) {
+            this("HTTP Error : " + code + " => " + reason);
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
+    public static class ExceptionError extends Error {
+
+        private final Throwable cause;
+
+        public ExceptionError(String message, Throwable cause) {
+            super(message);
+            this.cause = cause;
+        }
+
+        public Throwable getCause() {
+            return cause;
+        }
+    }
 
     private final T output;
 
-    public BasicDownloader(String url, T output) {
+    public Download(String url, T output) {
         super();
         setURL(url);
         this.output = output;
     }
 
-    protected void onError(int code, String reason) {
-    }
+    protected abstract void onError(Error error);
 
     protected void onLengthKnown(int length) {
     }
@@ -33,9 +63,24 @@ public class BasicDownloader<T extends OutputStream>
     }
 
     @Override
+    protected void onConnectionFailed(Throwable throwable) {
+        onError(new ExceptionError("Connection failed", throwable));
+    }
+
+    @Override
+    protected void onExpire() {
+        onError(new Error("Expiration"));
+    }
+
+    @Override
+    protected void onException(Throwable throwable) {
+        onError(new ExceptionError("Exception", throwable));
+    }
+
+    @Override
     protected void onResponseStatus(Buffer http, int code, Buffer reasonBuf) {
         if (code != 200) {
-            onError(code, reasonBuf.toString(Util.UTF8));
+            onError(new Error(code, reasonBuf.toString(Util.UTF8)));
             cancel();
         }
     }
@@ -55,7 +100,7 @@ public class BasicDownloader<T extends OutputStream>
         try {
             content.writeTo(output);
         } catch (IOException exc) {
-            Logger.getLogger(BasicDownloader.class.getName())
+            Logger.getLogger(Download.class.getName())
                     .log(Level.WARNING,
                             "Cannot convert downloaded text to UTF-8", exc);
         }

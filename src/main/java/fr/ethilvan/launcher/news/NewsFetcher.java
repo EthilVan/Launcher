@@ -37,18 +37,19 @@ public class NewsFetcher {
     private static final String CACHE_DIRNAME = "newscache";
     private static final String CACHE_FILENAME = CACHE_DIRNAME + ".json";
 
-    private class NewsPageDownloader
-        extends NewsDownloader<ByteArrayOutputStream> {
+    private class NewsPageDownload
+        extends NewsDownload<ByteArrayOutputStream> {
 
-        public NewsPageDownloader(JProgressBar progressBar) {
+        public NewsPageDownload(JProgressBar progressBar) {
             super(Provider.get().newsUrl, new ByteArrayOutputStream(),
                     progressBar);
         }
 
         @Override
-        protected void onError(int code, String reason) {
-            cancel();
-            downloadsCount--;
+        protected void onError(Error error) {
+            decrementDownloads();
+            Logger.getLogger(NewsFetcher.class.getName()).log(Level.SEVERE,
+                    "Cannot fetch news", error.getMessage());
         }
 
         public void onComplete(ByteArrayOutputStream output) {
@@ -56,32 +57,40 @@ public class NewsFetcher {
                 newsPage = output.toString(Util.UTF8);
             } catch (UnsupportedEncodingException exc) {
                 Logger.getLogger(NewsFetcher.class.getName())
-                        .log(Level.WARNING, "Unable to convert news to UTF-8",
-                                exc);
-                newsPage = "<html><b><center>"
-                        + "Impossible d'afficher les news."
-                        + ")</center></b></html>";
+                    .log(Level.WARNING,
+                            "Unable to convert news to UTF-8", exc);
             }
-            downloadsCount--;
+            decrementDownloads();
         }
     }
 
-    private class ImageDownloader extends NewsDownloader<FileOutputStream> {
+    private class ImageDownload extends NewsDownload<FileOutputStream> {
 
-        public ImageDownloader(CachedImage img, JProgressBar progressBar)
+        public ImageDownload(CachedImage img, JProgressBar progressBar)
                 throws FileNotFoundException {
             super(img.getUrl(), new FileOutputStream(img.getFile(cacheDir)),
                     progressBar);
         }
 
         @Override
-        protected void onError(int code, String reason) {
-            downloadsCount--;
+        protected void onConnectionFailed(Throwable throwable) {
+            decrementDownloads();
+            Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.SEVERE, "Cannot download image \""
+                            + getRequestURI() + "\"", throwable);
+        }
+
+        @Override
+        protected void onError(Error error) {
+            decrementDownloads();
+            Logger.getLogger(NewsFetcher.class.getName())
+                    .log(Level.WARNING, "Cannot download image \""
+                            + getRequestURI() + "\"" + error.getMessage());
         }
 
         @Override
         protected void onComplete(FileOutputStream stream) {
-            downloadsCount--;
+            decrementDownloads();
         }
     }
 
@@ -99,14 +108,24 @@ public class NewsFetcher {
         newsPage = null;
     }
 
+    private synchronized void incrementDownloads() {
+        downloadsCount++;
+    }
+
+    private synchronized void decrementDownloads() {
+        downloadsCount--;
+    }
+
     public void fetch(NewsPanel newsPanel, JProgressBar progressBar) {
         ImageCache cache = getCache(progressBar);
-        NewsPageDownloader newsDownloader = new NewsPageDownloader(progressBar);
+        NewsPageDownload newsDownloader = new NewsPageDownload(progressBar);
 
-        downloadsCount++;
+        incrementDownloads();
         try {
             Launcher.get().download(newsDownloader);
         } catch (IOException exc) {
+            Logger.getLogger(NewsFetcher.class.getName())
+                .log(Level.SEVERE, "Cannot fetch news", exc);
             return;
         }
 
@@ -137,10 +156,10 @@ public class NewsFetcher {
         for (String banner : banners) {
             CachedImage cached = new CachedImage(banner);
             try {
-                ImageDownloader downloader =
-                        new ImageDownloader(cached, progressBar);
+                ImageDownload downloader =
+                        new ImageDownload(cached, progressBar);
                 Launcher.get().download(downloader);
-                downloadsCount++;
+                incrementDownloads();
                 newCache.add(cached);
             } catch (IOException exc) {
                 Logger.getLogger(NewsFetcher.class.getName())
@@ -156,21 +175,25 @@ public class NewsFetcher {
     private CachedImage[] loadSavedCache() {
         CachedImage[] cache;
 
+        FileReader reader = null;
         try {
-            cache = Launcher.getGson().fromJson(
-                    new FileReader(jsonFile), CachedImage[].class);
-        } catch (Exception exc) {
+            reader = new FileReader(jsonFile);
+            cache = Launcher.getGson().fromJson(reader, CachedImage[].class);
+        } catch (IOException exc) {
+            Logger.getLogger(NewsFetcher.class.getName()).log(Level.WARNING,
+                    "Unable to load images cache", exc);
             FileUtils.deleteQuietly(cacheDir);
             FileUtils.deleteQuietly(jsonFile);
             cache = new CachedImage[0];
+        } finally {
+            IOUtils.closeQuietly(reader);
         }
 
         try {
             FileUtils.forceMkdir(cacheDir);
         } catch (IOException exc) {
-            Logger.getLogger(NewsFetcher.class.getName())
-                    .log(Level.WARNING, "Unable to create cache directory",
-                            exc);
+            Logger.getLogger(NewsFetcher.class.getName()).log(Level.WARNING,
+                    "Unable to create cache directory", exc);
         }
 
         return cache;

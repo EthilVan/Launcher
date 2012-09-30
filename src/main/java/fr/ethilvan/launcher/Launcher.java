@@ -12,10 +12,12 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -33,7 +35,7 @@ import com.sk89q.mclauncher.LoginSession.OutdatedLauncherException;
 import com.sk89q.mclauncher.launch.GameAppletContainer;
 import com.sk89q.mclauncher.launch.GameFrame;
 
-import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Config;
 import fr.ethilvan.launcher.config.Options;
 import fr.ethilvan.launcher.ui.LauncherFrame;
 import fr.ethilvan.launcher.ui.TaskDialog;
@@ -41,37 +43,54 @@ import fr.ethilvan.launcher.updater.UpdateChecker;
 import fr.ethilvan.launcher.updater.Updater;
 import fr.ethilvan.launcher.util.Encryption.EncryptionException;
 import fr.ethilvan.launcher.util.OS;
+import fr.ethilvan.launcher.util.OneLineLoggerFormatter;
 
 public class Launcher {
 
     public static final String VERSION;
-    private static Logger logger;
+    private static Logger[] loggers;
 
     static {
         Package ppackage = Launcher.class.getPackage();
 
         String version;
         if (ppackage == null) {
-            version = "(inconnue)";
+            version = "inconnue";
         } else {
             version = ppackage.getImplementationVersion();
             if (version == null) {
-                version = "(inconnue)";
+                version = "inconnue";
             }
         }
 
-        logger = Logger.getLogger("fr.ethilvan.launcher");
+        loggers = new Logger[3]; 
+        loggers[0] = Logger.getLogger("fr.ethilvan.launcher");
+        loggers[1] = Logger.getLogger("com.sk89q.mclauncher");
+        loggers[2] = Logger.getLogger("org.xhtmlrenderer");
         try {
+            Formatter formatter = new OneLineLoggerFormatter();
+
+            Handler consoleHandler = new ConsoleHandler();
+            consoleHandler.setFormatter(formatter);
+
             File dir = new File(getSettingsDir(), "logs"); 
             FileUtils.forceMkdir(dir);
-            FileHandler fileHandler = new FileHandler(dir.getPath()
-                    + "/launcher.%u.%g.log", 80, 10, true);
-            fileHandler.setFormatter(new SimpleFormatter());
-            logger.addHandler(fileHandler);
-            if (version.contains("SNAPSHOT")) {
-                logger.setLevel(Level.ALL);
+            Handler fileHandler = new FileHandler(dir.getPath()
+                    + "/launcher.%u.%g.log", 1000, 10, true);
+            fileHandler.setFormatter(formatter);
+
+            Level level;
+            if (version.contains("SNAPSHOT") || version.equals("inconnue")) {
+                level = Level.ALL;
             } else {
-                logger.setLevel(Level.WARNING);
+                level = Level.WARNING;
+            }
+
+            for (Logger logger : loggers) {
+                logger.setUseParentHandlers(false);
+                logger.addHandler(consoleHandler);
+                logger.addHandler(fileHandler);
+                logger.setLevel(level);
             }
         } catch (SecurityException exc) {
             exc.printStackTrace();
@@ -85,6 +104,9 @@ public class Launcher {
     private static Launcher instance;
 
     public static void main(String[] args) {
+        Logger.getLogger(Launcher.class.getName())
+            .info("Starting Ethil Van Launcher version " + VERSION);
+
         instance = new Launcher();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -104,9 +126,8 @@ public class Launcher {
         try {
             FileUtils.forceMkdir(dir);
         } catch (IOException exc) {
-            Logger.getLogger(Launcher.class.getName())
-                    .log(Level.SEVERE,
-                            "Unable to create .evlauncher directory", exc);
+            Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE,
+                    "Unable to create .evlauncher directory", exc);
         }
 
         return dir;
@@ -121,15 +142,14 @@ public class Launcher {
 
     private HttpClient client;
     private Options options;
-    private Configuration config;
+    private Config config;
     private LauncherFrame frame;
 
     public Launcher() {
-        System.setProperty("http.agent",
-                "EthilVanLauncher/" + VERSION
-                + " (" + OS.get().name() +
-                "; +" + Provider.get().website + ")");
+        System.setProperty("http.agent", "EthilVanLauncher/" + VERSION
+                + " (" + OS.get().name() + "; +http://ethilvan.fr)");
 
+        Logger.getLogger(Launcher.class.getName()).info("Starting HttpClient");
         client = new HttpClient();
         try {
             client.start();
@@ -140,14 +160,14 @@ public class Launcher {
         }
 
         options = new Options();
-        config = Configuration.load();
+        config = Config.load();
     }
 
     public Options getOptions() {
         return options;
     }
 
-    public Configuration getConfig() {
+    public Config getConfig() {
         return config;
     }
 
@@ -161,6 +181,9 @@ public class Launcher {
 
     public void download(HttpExchange exchange) throws IOException {
         if (client != null) {
+            Logger.getLogger(Launcher.class.getName())
+                    .info("Starting download of \"" + exchange.getAddress()
+                            + exchange.getRequestURI() + "\"");
             client.send(exchange);
         }
     }
@@ -183,6 +206,9 @@ public class Launcher {
     }
 
     public void login(TaskDialog dialog, String name, char[] password) {
+        Logger.getLogger(Launcher.class.getName())
+                .info("Logging in with username : " + name);
+
         dialog.setStatus("Authentification ...", null);
         LoginSession session = new LoginSession(name);
         String passwordStr = new String(password);
@@ -206,7 +232,7 @@ public class Launcher {
 
                 update(dialog, session);
             } else {
-                dialog.setError("Nom d'utilisateur ou mot de passe invalide");
+                dialog.setError("Nom d'utilisateur ou mot de passe invalide.");
             }
         } catch (IOException exc) {
             Logger.getLogger(Launcher.class.getName())
@@ -221,18 +247,21 @@ public class Launcher {
     }
 
     public void update(TaskDialog dialog, LoginSession session) {
+        Logger.getLogger(Launcher.class.getName()).info("Checking for update");
         final UpdateChecker checker = new UpdateChecker();
         if (!options.getForceUpdate() && !checker.needUpdate(dialog)) {
             launch(dialog, session);
             return;
         }
 
+        Logger.getLogger(Launcher.class.getName()).info("Updating");
         Updater updater = new Updater(checker, dialog);
         updater.perform();
         launch(dialog, session);
     }
 
     public void launch(TaskDialog dialog, LoginSession session) {
+        Logger.getLogger(Launcher.class.getName()).info("Launching");
         File dir = getGameDirectory();
         ClassLoader classLoader = setupClassLoader(dir);
 
@@ -266,13 +295,6 @@ public class Launcher {
                         .log(Level.SEVERE, "Unable to stop http client", exc);
             }
 
-            instance = null;
-            logger = null;
-            frame = null;
-            client = null;
-            options = null;
-            config = null;
-
             GameAppletContainer container = new GameAppletContainer(params,
                     applet);
             gameFrame.start(container);
@@ -289,6 +311,8 @@ public class Launcher {
     }
 
     private ClassLoader setupClassLoader(File dir) {
+        Logger.getLogger(Launcher.class.getName())
+                .info("Setting up classpath");
         System.setProperty("org.lwjgl.librarypath",
                 new File(dir, "bin/natives").getAbsolutePath());
         System.setProperty("net.java.games.input.librarypath",
@@ -352,5 +376,16 @@ public class Launcher {
         }
 
         return classLoader;
+    }
+
+    public void cleanUp() {
+        Logger.getLogger(Launcher.class.getName()).info("Cleaning up");
+        instance = null;
+        loggers = null;
+        frame = null;
+        client = null;
+        options = null;
+        config = null;
+        System.gc();
     }
 }

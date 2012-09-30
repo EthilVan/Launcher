@@ -28,9 +28,9 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Config;
 import fr.ethilvan.launcher.config.Options;
-import fr.ethilvan.launcher.mode.ModeDownloader;
+import fr.ethilvan.launcher.mode.ModeDownload;
 import fr.ethilvan.launcher.mode.Modes;
 import fr.ethilvan.launcher.util.Util;
 
@@ -72,7 +72,7 @@ public class OptionsDialog extends JDialog {
         GeneralPanel() {
             super();
             Options options = Launcher.get().getOptions();
-            Configuration config = Launcher.get().getConfig();
+            Config config = Launcher.get().getConfig();
 
             Insets insets = new Insets(0, 0, 6, 0);
 
@@ -266,8 +266,8 @@ public class OptionsDialog extends JDialog {
                     ByteArrayOutputStream output = new ByteArrayOutputStream();
                     String url = addUrl.getText();
                     try {
-                        ModeDownloader modeDownloader = 
-                                 new ModeDownloader(url, output, dialog);
+                        ModeDownload modeDownloader = 
+                                 new ModeDownload(url, output, dialog);
                          Launcher.get().download(modeDownloader);
                     } catch (IllegalArgumentException exc) {
                         dialog.setError("URL invalide !");

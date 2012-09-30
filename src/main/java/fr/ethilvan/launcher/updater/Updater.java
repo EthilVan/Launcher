@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Config;
 import fr.ethilvan.launcher.ui.TaskDialog;
 import fr.ethilvan.launcher.util.OS;
 
@@ -45,7 +45,7 @@ public class Updater {
                             + "to store downloaded files", exc);
         }
 
-        UpdateList updateList = new UpdateList(dialog);
+        PackageList updateList = new PackageList(dialog);
         updateList.fetch();
         try {
             updateList.waitForDone();
@@ -55,24 +55,24 @@ public class Updater {
         downloadAll(updateList.getDownloads());
     }
 
-    private void downloadAll(DownloadInfo[] downloadsInfo) {
+    private void downloadAll(Package[] downloadsInfo) {
         downloadsCount = downloadsInfo.length;
 
         Set<String> tags = new HashSet<String>();
         tags.add(OS.get().name().toLowerCase());
-        Configuration config = Launcher.get().getConfig();
+        Config config = Launcher.get().getConfig();
         if (config.getUseDefaultConfig()) {
             tags.add("config");
         }
         tags.add(config.getUseLatestLWJGL() ? "lwjgl" : "lwjglold");
 
-        for (DownloadInfo downloadInfo : downloadsInfo) {
+        for (Package downloadInfo : downloadsInfo) {
             if (!downloadInfo.isValid(tags)) {
                 downloadsCount--;
                 continue;
             }
 
-            Download download = new Download(dialog, downloadInfo) {
+            PackageDownload download = new PackageDownload(dialog, downloadInfo) {
                 @Override
                 protected void onResponseComplete() {
                     super.onResponseComplete();
@@ -90,7 +90,7 @@ public class Updater {
         }
     }
 
-    private void onDownloadComplete(DownloadInfo info) {
+    private void onDownloadComplete(Package info) {
         try {
             File tmpFile = info.getTemp(tmpDir);
             File targetPath = new File(Launcher.get().getGameDirectory(),

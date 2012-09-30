@@ -16,18 +16,20 @@ import org.apache.commons.io.IOUtils;
 
 import fr.ethilvan.launcher.ui.TaskDialog;
 
-public enum DownloadFilter {
+public enum PackageFilter {
 
     None {
         public void filter(TaskDialog dialog, InputStream input,
                 File targetPath) {
+            Logger.getLogger(PackageFilter.class.getName())
+                    .info("Copying package " + targetPath);
             FileOutputStream output = null;
             try {
                 FileUtils.forceMkdir(targetPath.getParentFile());
                 output = new FileOutputStream(targetPath);
                 IOUtils.copy(input, output);
             } catch (IOException exc) {
-                Logger.getLogger(DownloadFilter.class.getName())
+                Logger.getLogger(PackageFilter.class.getName())
                         .log(Level.SEVERE, "Unable to copy downloaded file",
                                 exc);
             } finally {
@@ -53,16 +55,18 @@ public enum DownloadFilter {
                         continue;
                     }
 
+                    File targetFile = new File(targetPath, entry.getName());
+                    Logger.getLogger(PackageFilter.class.getName())
+                            .info("Uncompressing " + entry.getName());
                     dialog.setStatus("Décompression de " + entry.getName(),
                             null);
-                    File targetFile = new File(targetPath, entry.getName());
                     FileUtils.forceMkdir(targetFile.getParentFile());
                     OutputStream output = new FileOutputStream(targetFile);
                     IOUtils.copy(tarIS, output);
                     IOUtils.closeQuietly(output);
                 }
             } catch (IOException exc) {
-                Logger.getLogger(DownloadFilter.class.getName())
+                Logger.getLogger(PackageFilter.class.getName())
                         .log(Level.SEVERE,
                                 "Unable to uncompress downloaded file", exc);
             } finally {

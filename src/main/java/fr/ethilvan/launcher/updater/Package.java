@@ -3,18 +3,18 @@ package fr.ethilvan.launcher.updater;
 import java.io.File;
 import java.util.Set;
 
-public class DownloadInfo {
+public class Package {
 
     private final String name;
     private final String path;
     private final String url;
     private final String[] tags;
-    private final DownloadFilter filter;
+    private final PackageFilter filter;
 
     private transient File tmpFile = null;
 
-    public DownloadInfo(String name, String path, String url, String[] tags,
-            DownloadFilter filter) {
+    public Package(String name, String path, String url, String[] tags,
+            PackageFilter filter) {
         this.name = name;
         this.path = path;
         this.url = url;
@@ -56,9 +56,9 @@ public class DownloadInfo {
         return tmpFile;
     }
 
-    public DownloadFilter getFilter() {
+    public PackageFilter getFilter() {
         if (filter == null) {
-            return DownloadFilter.None;
+            return PackageFilter.None;
         }
 
         return filter;

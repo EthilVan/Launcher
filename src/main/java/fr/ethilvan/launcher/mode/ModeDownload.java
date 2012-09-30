@@ -8,25 +8,27 @@ import java.util.logging.Logger;
 import javax.swing.DefaultBoundedRangeModel;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Config;
 import fr.ethilvan.launcher.ui.TaskDialog;
-import fr.ethilvan.launcher.util.BasicDownloader;
+import fr.ethilvan.launcher.util.Download;
 import fr.ethilvan.launcher.util.Util;
 
-public class ModeDownloader extends BasicDownloader<ByteArrayOutputStream> {
+public class ModeDownload extends Download<ByteArrayOutputStream> {
 
     private final TaskDialog dialog;
     private DefaultBoundedRangeModel model;
 
-    public ModeDownloader(String url, ByteArrayOutputStream output,
+    public ModeDownload(String url, ByteArrayOutputStream output,
             TaskDialog dialog) {
         super(url, output);
         this.dialog = dialog;
     }
 
     @Override
-    protected void onError(int code, String reason) {
-        dialog.setError("Erreur: " + code + " - " + reason);
+    protected void onError(Download.Error error) {
+        dialog.setError("Erreur: " + error.getMessage());
+        Logger.getLogger(Config.class.getName()).log(Level.WARNING,
+                "Cannot download mode informations" + error.getMessage());
     }
 
     @Override
@@ -45,20 +47,18 @@ public class ModeDownloader extends BasicDownloader<ByteArrayOutputStream> {
         Mode mode = null;
         try {
             String json = output.toString(Util.UTF8);
-            mode = Launcher.getGson()
-                    .fromJson(json, Mode.class);
+            mode = Launcher.getGson().fromJson(json, Mode.class);
         } catch (UnsupportedEncodingException exc) {
-            Logger.getLogger(Configuration.class.getName())
-                    .log(Level.SEVERE, "Unable to read downloaded mode", exc);
+            Logger.getLogger(Config.class.getName()).log(Level.SEVERE,
+                    "Unable to read downloaded mode", exc);
         }
 
         try {
             Modes modes = Launcher.get().getConfig().getModes();
             modes.addMode(mode);
             dialog.dispose();
-        } catch (AlreadyRegisteredMode e) {
-            dialog.setError("Le mode \"" + mode.getName()
-                    + "\" existe déjà.");
+        } catch (AlreadyRegisteredMode exc) {
+            dialog.setError("Le mode \"" + mode.getName() + "\" existe déjà.");
         }
     }
 }

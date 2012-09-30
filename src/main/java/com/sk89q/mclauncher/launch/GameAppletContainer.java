@@ -26,6 +26,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import fr.ethilvan.launcher.Launcher;
+
 public class GameAppletContainer extends Applet implements AppletStub {
     
     private static final Logger logger = Logger.getLogger(GameAppletContainer.class.getCanonicalName());
@@ -54,6 +56,7 @@ public class GameAppletContainer extends Applet implements AppletStub {
         applet.start();
         validate();
         logger.info("Cave Johnson, we're done here.");
+        Launcher.get().cleanUp();
     }
 
     @Override

@@ -25,6 +25,7 @@ public class Provider {
     }
 
     private static Provider load() {
+        Logger.getLogger(Provider.class.getName()).info("Loading provider");
         InputStream stream =
                 Provider.class.getResourceAsStream("/config.json");
 

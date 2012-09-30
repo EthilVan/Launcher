@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Config;
 
 public class ImageCache {
 
@@ -59,9 +59,8 @@ public class ImageCache {
                 Image img = ImageIO.read(cached.getFile(cacheDir));
                 map.put(url, img);
             } catch (IOException exc) {
-                Logger.getLogger(Configuration.class.getName())
-                        .log(Level.WARNING, "Unable to load cached image",
-                                exc);
+                Logger.getLogger(Config.class.getName()).log(Level.WARNING,
+                        "Unable to load cached image", exc);
             }
         }
     }

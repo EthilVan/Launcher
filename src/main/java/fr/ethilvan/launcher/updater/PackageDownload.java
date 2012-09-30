@@ -1,41 +1,47 @@
 package fr.ethilvan.launcher.updater;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.client.HttpExchange;
 import org.eclipse.jetty.io.Buffer;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import fr.ethilvan.launcher.Launcher;
 import fr.ethilvan.launcher.ui.TaskDialog;
 
-public class UpdateList extends HttpExchange {
-
-    private static final String STATUS = "Récuperation des téléchargements.";
+public class PackageDownload extends HttpExchange {
 
     private final TaskDialog dialog;
+    protected final Package info;
+    private final String title;
     private final BoundedRangeModel progress;
 
-    private ByteArrayOutputStream output;
+    private OutputStream output;
 
-    public UpdateList(TaskDialog dialog) {
+    public PackageDownload(TaskDialog dialog, Package info) {
         super();
         this.dialog = dialog;
+        this.info = info;
+        this.title = "Téléchargement de " + info.getName() + " ...";
         this.progress = new DefaultBoundedRangeModel();
     }
 
-    public void fetch() {
-        output = new ByteArrayOutputStream();
-        setURL(Launcher.get().getConfig().getMode().getListUrl());
+    public void start(File tmpDir) {
+        try {
+            File tmpFile = info.getTemp(tmpDir);
+            output = FileUtils.openOutputStream(tmpFile);
+        } catch (IOException exc) {
+            exc.printStackTrace();
+        }
 
-        dialog.setStatus(STATUS, null);
+        dialog.setStatus(title, null);
+        setURL(info.getUrl());
         try {
             Launcher.get().download(this);
         } catch (IOException exc) {
@@ -49,14 +55,14 @@ public class UpdateList extends HttpExchange {
             progress.setMinimum(0);
             progress.setMaximum(length);
             progress.setValue(0);
-            dialog.setStatus(STATUS, progress);
+            dialog.setStatus(title, progress);
         }
     }
 
     @Override
     protected void onResponseContent(Buffer content) {
         progress.setValue(progress.getValue() + content.length());
-        dialog.setStatus(STATUS, progress);
+        dialog.setStatus(title, progress);
         try {
             content.writeTo(output);
         } catch (IOException exc) {
@@ -64,10 +70,8 @@ public class UpdateList extends HttpExchange {
         }
     }
 
-    public DownloadInfo[] getDownloads() {
-        String listJson = output.toString();
+    @Override
+    protected void onResponseComplete() {
         IOUtils.closeQuietly(output);
-        Gson gson = new GsonBuilder().create();
-        return gson.fromJson(listJson, DownloadInfo[].class);
     }
 }

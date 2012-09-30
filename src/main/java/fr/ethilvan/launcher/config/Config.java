@@ -19,7 +19,7 @@ import fr.ethilvan.launcher.mode.Modes;
 import fr.ethilvan.launcher.util.Encryption;
 import fr.ethilvan.launcher.util.Encryption.EncryptionException;
 
-public class Configuration {
+public class Config {
 
     private final Modes modes;
     private String username;
@@ -27,23 +27,23 @@ public class Configuration {
     private boolean useDefaultConfig;
     private boolean useLatestLwjgl;
 
-    public static Configuration load() {
+    public static Config load() {
+        Logger.getLogger(Config.class.getName()).info("Loading configuration");
         File optionsFile = configFile();
-        Configuration options = null;
+        Config options = null;
         if (optionsFile.exists()) {
             FileReader reader = null;
             try {
                 reader = new FileReader(optionsFile);
-                options = Launcher.getGson().fromJson(reader,
-                        Configuration.class);
+                options = Launcher.getGson().fromJson(reader, Config.class);
             } catch (JsonSyntaxException exc) {
-                Logger.getLogger(Configuration.class.getName())
+                Logger.getLogger(Config.class.getName())
                         .log(Level.SEVERE, "Unable to read user config", exc);
             } catch (JsonIOException exc) {
-                Logger.getLogger(Configuration.class.getName())
+                Logger.getLogger(Config.class.getName())
                         .log(Level.SEVERE, "Unable to read user config", exc);
             } catch (FileNotFoundException exc) {
-                Logger.getLogger(Configuration.class.getName())
+                Logger.getLogger(Config.class.getName())
                         .log(Level.SEVERE, "Unable to read user config", exc);
             } finally {
                 IOUtils.closeQuietly(reader);
@@ -51,7 +51,7 @@ public class Configuration {
         }
 
         if (options == null) {
-            options = new Configuration();
+            options = new Config();
         }
 
         return options;
@@ -61,22 +61,23 @@ public class Configuration {
         return new File(Launcher.getSettingsDir(), "config.json");
     }
 
-    private Configuration() {
+    private Config() {
         this.modes = new Modes();
         this.useDefaultConfig = true;
         this.useLatestLwjgl = false;
     }
 
     public void save() {
+        Logger.getLogger(Config.class.getName()).info("Saving configuration");
         FileWriter writer = null;
         try {
             writer = new FileWriter(configFile());
             Launcher.getGson().toJson(this, writer);
         } catch (JsonIOException exc) {
-            Logger.getLogger(Configuration.class.getName())
+            Logger.getLogger(Config.class.getName())
                     .log(Level.SEVERE, "Unable to write user config", exc);
         } catch (IOException exc) {
-            Logger.getLogger(Configuration.class.getName())
+            Logger.getLogger(Config.class.getName())
                     .log(Level.SEVERE, "Unable to write user config", exc);
         } finally {
             IOUtils.closeQuietly(writer);

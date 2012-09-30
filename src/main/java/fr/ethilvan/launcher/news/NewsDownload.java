@@ -7,13 +7,14 @@ import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-import fr.ethilvan.launcher.util.BasicDownloader;
+import fr.ethilvan.launcher.util.Download;
 
-public class NewsDownloader<T extends OutputStream> extends BasicDownloader<T> {
+public abstract class NewsDownload<T extends OutputStream>
+        extends Download<T> {
 
     private final JProgressBar progressBar;
 
-    public NewsDownloader(String url, T output, JProgressBar progressBar) {
+    public NewsDownload(String url, T output, JProgressBar progressBar) {
         super(url, output);
         this.progressBar = progressBar;
     }

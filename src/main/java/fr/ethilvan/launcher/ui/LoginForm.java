@@ -24,7 +24,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import fr.ethilvan.launcher.Launcher;
-import fr.ethilvan.launcher.config.Configuration;
+import fr.ethilvan.launcher.config.Config;
 import fr.ethilvan.launcher.util.Encryption.EncryptionException;
 
 public class LoginForm extends JPanel {
@@ -108,7 +108,7 @@ public class LoginForm extends JPanel {
         usernameLabel.setLabelFor(username);
         passwordLabel.setLabelFor(password);
 
-        Configuration config = Launcher.get().getConfig();
+        Config config = Launcher.get().getConfig();
         String rememberedUsername = config.getUsername();
         if (rememberedUsername != null) {
             username.setText(rememberedUsername);
