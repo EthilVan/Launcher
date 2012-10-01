@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,8 +88,16 @@ public class NewsPanel extends JPanel {
             }
         }
         xhtmlPane.addMouseTrackingListener(new LinkListener() {
-            public void linkClicked(BasicPanel panel, String uri) {
-                Util.openURL(uri);
+            public void linkClicked(BasicPanel panel, String path) {
+                try {
+                    URI uri = new URI(panel.getSharedContext().getBaseURL());
+                    Util.openURI(uri.resolve(path));
+                } catch (URISyntaxException exc) {
+                    Logger.getLogger(NewsPanel.class.getName())
+                            .log(Level.WARNING, "Can't resolve uri (base: \""
+                                    + panel.getSharedContext().getBaseURL()
+                                    + "\", path: \"" + path + "\")");
+                }
             }
         });
 
