@@ -1,5 +1,7 @@
 package fr.ethilvan.launcher.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,6 +26,18 @@ public class OneLineLoggerFormatter extends Formatter {
         builder.append("#");
         builder.append(record.getSourceMethodName());
         builder.append(")\n");
+
+        Throwable thrown = record.getThrown();
+        if (thrown != null) {
+            try {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                thrown.printStackTrace(pw);
+                pw.close();
+                builder.append(sw.toString());
+            } catch (Exception ex) {
+            }
+        }
 
         return builder.toString();
     }

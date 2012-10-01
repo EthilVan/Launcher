@@ -37,7 +37,7 @@ public class PackageDownload extends Download<OutputStream> {
 
     private PackageDownload(Updater updater, TaskDialog dialog,
             Package ppackage, OutputStream output) {
-        super(ppackage.url, output);
+        super(ppackage.getUrl(), output);
         this.updater = updater;
         this.dialog = dialog;
         this.ppackage = ppackage;

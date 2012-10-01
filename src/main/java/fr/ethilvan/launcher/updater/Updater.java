@@ -150,7 +150,7 @@ public class Updater {
                     .log(Level.SEVERE, "Unable to read downloaded file", exc);
         }
 
-        if (--downloadsCount == 0) {
+        if (downloadsCount == 0) {
             FileUtils.deleteQuietly(tmpDir);
             updateChecker.updatePerformed();
             done = true;

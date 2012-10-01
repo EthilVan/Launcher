@@ -1,13 +1,19 @@
 package fr.ethilvan.launcher.updater;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import fr.ethilvan.launcher.Launcher;
 
 public class Package {
 
     public final String name;
     public final String path;
-    public final String url;
+    private final String url;
     private final String[][] tags;
     private final PackageFilter filter;
 
@@ -38,6 +44,20 @@ public class Package {
         }
 
         return match;
+    }
+
+    public String getUrl() {
+        String baseUrl = Launcher.get().getConfig().getMode().getListUrl();
+        try { 
+            URI uri = new URI(baseUrl);
+            return uri.resolve(url).toString();
+        } catch (URISyntaxException exc) {
+            Logger.getLogger(Package.class.getName()).log(Level.SEVERE,
+                    "Can't resolve uri (base: \"" + baseUrl + "\", path: \""
+                            + path + "\")");
+        }
+
+        return url;
     }
 
     public File getTemp(File tmpDir) {
