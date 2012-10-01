@@ -6,9 +6,9 @@
 	"modes": [
 		{
 			"name": "Ethil Van",
-			"directory": ".ethilvan2",
+			"directory": ".ethilvan",
 			"version-url": "http://updates.ethilvan.fr/ethilvan/version",
-			"list-url": "http://updates.ethilvan.fr/ethilvan/list.json",
+			"list-url": "http://updates.ethilvan.fr/ethilvan/packages.json",
 			"server": "play.ethilvan.fr"
 		}
 	]
