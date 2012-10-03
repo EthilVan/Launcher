@@ -62,8 +62,9 @@ public class Launcher {
                 version = "inconnue";
             }
         }
+        VERSION = version;
 
-        loggers = new Logger[3]; 
+        loggers = new Logger[3];
         loggers[0] = Logger.getLogger("fr.ethilvan.launcher");
         loggers[1] = Logger.getLogger("com.sk89q.mclauncher");
         loggers[2] = Logger.getLogger("org.xhtmlrenderer");
@@ -80,7 +81,7 @@ public class Launcher {
             fileHandler.setFormatter(formatter);
 
             Level level;
-            if (version.contains("SNAPSHOT") || version.equals("inconnue")) {
+            if (VERSION.contains("SNAPSHOT") || VERSION.equals("inconnue")) {
                 level = Level.ALL;
             } else {
                 level = Level.WARNING;
@@ -98,7 +99,6 @@ public class Launcher {
             exc.printStackTrace();
         }
 
-        VERSION = version;
     }
 
     private static Launcher instance;
