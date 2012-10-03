@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import fr.ethilvan.launcher.Launcher;
+import fr.ethilvan.launcher.Provider;
 
 public class LauncherFrame extends JFrame {
 
@@ -24,7 +25,7 @@ public class LauncherFrame extends JFrame {
     }
 
     private void build() {
-        setTitle("Ethil Van Launcher");
+        setTitle(Provider.get().launcherTitle);
         setMinimumSize(new Dimension(1020, 620));
         setLocationRelativeTo(null);
 

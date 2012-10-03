@@ -48,12 +48,16 @@ public class Provider {
         return null;
     }
 
+    public final String launcherTitle;
+    public final String gameTitle;
     public final String website;
     public final String newsUrl;
     public final String imgListUrl;
     public final Mode[] modes;
 
     private Provider() {
+        launcherTitle = null;
+        gameTitle = null;
         website = null;
         newsUrl = null;
         imgListUrl = null;

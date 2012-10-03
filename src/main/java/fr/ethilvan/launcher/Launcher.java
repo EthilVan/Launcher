@@ -278,7 +278,7 @@ public class Launcher {
             GameFrame gameFrame = new GameFrame(new Dimension(854, 480));
             gameFrame.setDefaultCloseOperation(
                     WindowConstants.DISPOSE_ON_CLOSE);
-            gameFrame.setTitle("Ethil Van");
+            gameFrame.setTitle(Provider.get().gameTitle);
             gameFrame.setVisible(true);
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("stand-alone", "true");
