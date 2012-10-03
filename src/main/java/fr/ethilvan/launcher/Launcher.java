@@ -48,6 +48,7 @@ import fr.ethilvan.launcher.util.OneLineLoggerFormatter;
 public class Launcher {
 
     public static final String VERSION;
+    public static final String USER_AGENT;
     private static Logger[] loggers;
 
     static {
@@ -99,14 +100,16 @@ public class Launcher {
             exc.printStackTrace();
         }
 
+        Provider provider = Provider.get();
+        USER_AGENT = "EthilVanLauncher/" + VERSION
+                + " FlyingSaucer/9.0.1 (" + OS.get().name() + "; provider("
+                + provider.launcherTitle + "," + provider.website
+                + "); +http://ethilvan.fr)";
     }
 
     private static Launcher instance;
 
     public static void main(String[] args) {
-        Logger.getLogger(Launcher.class.getName())
-            .info("Starting Ethil Van Launcher version " + VERSION);
-
         instance = new Launcher();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -146,8 +149,11 @@ public class Launcher {
     private LauncherFrame frame;
 
     public Launcher() {
-        System.setProperty("http.agent", "EthilVanLauncher/" + VERSION
-                + " (" + OS.get().name() + "; +http://ethilvan.fr)");
+        Logger.getLogger(Launcher.class.getName())
+                .info("Starting Ethil Van Launcher :");
+        Logger.getLogger(Launcher.class.getName())
+                .info(USER_AGENT);
+        System.setProperty("http.agent", USER_AGENT);
 
         Logger.getLogger(Launcher.class.getName()).info("Starting HttpClient");
         client = new HttpClient();
@@ -184,6 +190,7 @@ public class Launcher {
             Logger.getLogger(Launcher.class.getName())
                     .info("Starting download of \"" + exchange.getAddress()
                             + exchange.getRequestURI() + "\"");
+            exchange.setRequestHeader("User-Agent", USER_AGENT);
             client.send(exchange);
         }
     }
