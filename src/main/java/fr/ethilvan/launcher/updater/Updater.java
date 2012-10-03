@@ -41,6 +41,8 @@ public class Updater {
             tags.add("config");
         }
         tags.add(config.getUseLatestLWJGL() ? "lwjgl" : "lwjglold");
+        Logger.getLogger(Updater.class.getName())
+                .info("Update tags : " + tags);
     }
 
     public boolean perform() {
@@ -69,6 +71,8 @@ public class Updater {
     }
 
     private Update getPackageList() {
+        Logger.getLogger(Updater.class.getName())
+                .info("Fetching packages list.");
         UpdateDownload updateList = new UpdateDownload(dialog);
         try {
             Launcher.get().download(updateList);

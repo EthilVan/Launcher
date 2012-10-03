@@ -40,7 +40,7 @@ public class UpdateChecker {
     }
 
     public boolean isFirstUpdate() {
-        return getLocalVersionFile().exists();
+        return !getLocalVersionFile().exists();
     }
 
     private File getLocalVersionFile() {
