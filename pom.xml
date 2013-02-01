@@ -93,9 +93,7 @@
 							</addDefaultImplementationEntries>
 						</manifest>
 						<manifestEntries>
-							<Implementation-Version>
-								${project.version}-b${BUILD_NUMBER}
-							</Implementation-Version>
+							<Implementation-Version>${BUILD_NUMBER}</Implementation-Version>
 							<Main-Class>fr.ethilvan.launcher.Launcher</Main-Class>
 						</manifestEntries>
 					</archive>
@@ -137,7 +135,7 @@
 				</property>
 			</activation>
 			<properties>
-				<BUILD_NUMBER>Custom</BUILD_NUMBER>
+				<BUILD_NUMBER>${project.version}-bCustom</BUILD_NUMBER>
 			</properties>
 		</profile>
 
