@@ -26,6 +26,7 @@ public class Config {
     private String password;
     private boolean useDefaultConfig;
     private boolean useLatestLwjgl;
+    private boolean downloadTexturePack;
 
     public static Config load() {
         Logger.getLogger(Config.class.getName()).info("Loading configuration");
@@ -129,5 +130,13 @@ public class Config {
 
     public void setUseLatestLWJGL(boolean useLatestLWJGL) {
         this.useLatestLwjgl = useLatestLWJGL;
+    }
+
+    public boolean getDownloadTexturePack() {
+        return downloadTexturePack;
+    }
+
+    public void setDownloadTexturePack(boolean downloadTexturePack) {
+        this.downloadTexturePack = downloadTexturePack;
     }
 }

@@ -134,6 +134,26 @@ public class OptionsDialog extends JDialog {
             latestLWJGLC.gridy = 2;
             add(latestLWJGL, latestLWJGLC);
 
+            JLabel texturePackLabel =
+                    new JLabel("Télécharger le pack de texture :");
+            GridBagConstraints texturePackLabelC = new GridBagConstraints();
+            texturePackLabelC.insets = insets;
+            texturePackLabelC.anchor = GridBagConstraints.LINE_START;
+            texturePackLabelC.gridx = 0;
+            texturePackLabelC.gridy = 3;
+            add(texturePackLabel, texturePackLabelC);
+
+            JToggleButton texturePack = new JCheckBox();
+            texturePack.setOpaque(false);
+            texturePack.setHorizontalTextPosition(SwingConstants.LEFT);
+            texturePack.setSelected(config.getDownloadTexturePack());
+            GridBagConstraints texturePackC = new GridBagConstraints();
+            texturePackC.insets = insets;
+            texturePackC.anchor = GridBagConstraints.LINE_END;
+            texturePackC.gridx = 1;
+            texturePackC.gridy = 3;
+            add(texturePack, texturePackC);
+
             JLabel directoryLabel = new JLabel("Dossier du jeu : ",
                     SwingConstants.RIGHT);
             GridBagConstraints directoryLabelC = new GridBagConstraints();
@@ -141,7 +161,7 @@ public class OptionsDialog extends JDialog {
             directoryLabelC.ipady = 8;
             directoryLabelC.anchor = GridBagConstraints.LINE_START;
             directoryLabelC.gridx = 0;
-            directoryLabelC.gridy = 3;
+            directoryLabelC.gridy = 4;
             add(directoryLabel, directoryLabelC);
 
             final JLabel directory = new JLabel("<html><a href=\"\">"
@@ -152,7 +172,7 @@ public class OptionsDialog extends JDialog {
             directoryC.ipady = 8;
             directoryC.anchor = GridBagConstraints.LINE_END;
             directoryC.gridx = 1;
-            directoryC.gridy = 3;
+            directoryC.gridy = 4;
             add(directory, directoryC);
 
             JLabel versionLabel = new JLabel("Version du launcher : ");
@@ -161,7 +181,7 @@ public class OptionsDialog extends JDialog {
             versionLabelC.ipady = 8;
             versionLabelC.anchor = GridBagConstraints.LINE_START;
             versionLabelC.gridx = 0;
-            versionLabelC.gridy = 4;
+            versionLabelC.gridy = 5;
             add(versionLabel, versionLabelC);
 
             JLabel version = new JLabel(Launcher.VERSION);
@@ -170,7 +190,7 @@ public class OptionsDialog extends JDialog {
             versionC.ipady = 8;
             versionC.anchor = GridBagConstraints.LINE_END;
             versionC.gridx = 1;
-            versionC.gridy = 4;
+            versionC.gridy = 5;
             add(version, versionC);
 
             JButton done = new JButton("Terminer");
@@ -178,7 +198,7 @@ public class OptionsDialog extends JDialog {
             doneC.anchor = GridBagConstraints.LAST_LINE_END;
             doneC.insets = new Insets(6, 0, 0, 0);
             doneC.gridx = 1;
-            doneC.gridy = 5;
+            doneC.gridy = 6;
             add(done, doneC);
 
             forceUpdate.addItemListener(new ItemListener() {
@@ -201,6 +221,14 @@ public class OptionsDialog extends JDialog {
                 @Override
                 public void itemStateChanged(ItemEvent event) {
                     Launcher.get().getConfig().setUseLatestLWJGL(
+                            event.getStateChange() == ItemEvent.SELECTED);
+                }
+            });
+
+            texturePack.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent event) {
+                    Launcher.get().getConfig().setDownloadTexturePack(
                             event.getStateChange() == ItemEvent.SELECTED);
                 }
             });

@@ -41,6 +41,9 @@ public class Updater {
             tags.add("config");
         }
         tags.add(config.getUseLatestLWJGL() ? "lwjgl" : "lwjglold");
+        if (config.getDownloadTexturePack()) {
+            tags.add("texturepack");
+        }
         Logger.getLogger(Updater.class.getName())
                 .info("Update tags : " + tags);
     }
